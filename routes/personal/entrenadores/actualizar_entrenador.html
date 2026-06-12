@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BODY XTREME - Actualizar Entrenador</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilos.css">
+
+  <style>
+    body { font-family: 'Montserrat', sans-serif; background-color: #050505; color: #fff; margin: 0; overflow-x: hidden; }
+    
+    .fondo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    .fondo img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
+    .overlay { background: rgba(0, 0, 0, 0.75); min-height: 100vh; }
+
+    /* Efecto Cristal Oscuro */
+    .card-custom-form {
+      background: rgba(15, 15, 15, 0.95);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 255, 136, 0.1);
+    }
+
+    .form-label {
+      color: #00ff88;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    /* Inputs Personalizados */
+    .input-custom {
+      background: rgba(0, 0, 0, 0.5) !important;
+      border: 1px solid #444;
+      color: #fff !important;
+      padding: 10px 15px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    .input-custom:focus { border-color: #00ff88; box-shadow: 0 0 12px rgba(0, 255, 136, 0.3); outline: none; }
+    select.input-custom option { background: #1a1a1a; color: #fff; }
+    .input-custom::placeholder { color: rgba(255, 255, 255, 0.3) !important; }
+
+    /* Botones de acción */
+    .btn-update {
+      background: #029633;
+      color: #ffffff;
+      border: 2px solid #029633;
+      border-radius: 12px;
+      font-weight: 900;
+      transition: all 0.3s ease;
+    }
+    .btn-update:hover { 
+      background: #027a29; 
+      border-color: #027a29;
+      color: #ffffff; 
+      box-shadow: 0 0 20px rgba(2, 150, 51, 0.5); 
+      transform: translateY(-2px); 
+    }
+
+    .btn-cancel { 
+      border: 1px solid #6c757d;
+      color: #ffffff;
+      background: transparent;
+      border-radius: 12px; 
+      transition: all 0.3s; 
+    }
+    .btn-cancel:hover { 
+      background: #dc3545; 
+      border-color: #dc3545;
+      color: white; 
+      box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
+      transform: translateY(-2px); 
+    }
+
+    /* Modals Premium */
+    .modal-content-dark {
+      background: rgba(15, 15, 15, 0.98) !important;
+      backdrop-filter: blur(20px);
+      border: 1px solid #00ff88 !important;
+      color: #fff;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+    }
+    .modal-header { border-bottom: 1px solid rgba(0, 255, 136, 0.2); padding: 18px 25px; }
+    .modal-footer { border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 25px; }
+  </style>
+</head>
+
+<body>
+
+  <div class="fondo">
+    <img src="/images/fondoPersonal.png" alt="Fondo Gimnasio">
+  </div>
+
+  <div class="overlay d-flex align-items-center justify-content-center py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+
+          <div id="alert-container"></div>
+
+          <div class="card-custom-form p-4">
+            <div class="text-center mb-4 border-bottom pb-3 border-secondary">
+              <div class="d-inline-block p-2 rounded-circle mb-2" style="background: rgba(0, 255, 136, 0.1);">
+                <i class="bi bi-person-gear fs-2" style="color: #00ff88;"></i>
+              </div>
+              <h3 class="fw-bold m-0 text-white text-uppercase" style="letter-spacing: 1px;">
+                Modificar <span style="color: #00ff88;">Entrenador</span>
+              </h3>
+              <p class="text-white-50 small m-0 mt-1 fw-semibold">Edita los datos personales, especialidades o reasigna un contrato vigente</p>
+            </div>
+
+            <form id="form-actualizar-entrenador">
+              
+              <h5 class="text-white border-bottom border-secondary pb-2 mb-3" style="font-size: 0.95rem; letter-spacing: 0.5px;">1. Información Personal</h5>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="nombre" class="form-label"><i class="bi bi-person me-2"></i>Nombre(s)</label>
+                  <input type="text" id="nombre" class="form-control input-custom" placeholder="Nombres" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="paterno" class="form-label"><i class="bi bi-person-vcard me-2"></i>Apellido Paterno</label>
+                  <input type="text" id="paterno" class="form-control input-custom" placeholder="Apellido Paterno" required>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="materno" class="form-label"><i class="bi bi-person-vcard me-2"></i>Apellido Materno</label>
+                  <input type="text" id="materno" class="form-control input-custom" placeholder="Apellido Materno" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="telefono" class="form-label"><i class="bi bi-phone me-2"></i>Teléfono / Celular</label>
+                  <input type="number" id="telefono" class="form-control input-custom" placeholder="Ej: 71234567" required>
+                </div>
+              </div>
+
+              <h5 class="text-white border-bottom border-secondary pb-2 mt-4 mb-3" style="font-size: 0.95rem; letter-spacing: 0.5px;">2. Acceso y Contrato Laboral</h5>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="correo" class="form-label"><i class="bi bi-envelope me-2"></i>Correo Electrónico</label>
+                  <input type="email" id="correo" class="form-control input-custom" placeholder="entrenador@bodyxtreme.com" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="contrasena" class="form-label"><i class="bi bi-key me-2"></i>Contraseña de Acceso</label>
+                  <input type="password" id="contrasena" class="form-control input-custom" placeholder="Nueva contraseña opcional">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="id_especialidad" class="form-label"><i class="bi bi-award me-2"></i>Especialidad de Instrucción</label>
+                <div class="input-group">
+                  <select id="id_especialidad" class="form-select input-custom" required>
+                    <option value="" selected disabled>Cargando especialidades...</option>
+                  </select>
+                  <button class="btn btn-outline-success fw-bold text-uppercase px-3" style="font-size: 13px;" type="button" data-bs-toggle="modal" data-bs-target="#modalNuevaEspecialidad">
+                    <i class="bi bi-plus-lg"></i> Nueva
+                  </button>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="id_contrato" class="form-label"><i class="bi bi-file-earmark-text me-2"></i>Contrato Laboral Asignado</label>
+                <div class="input-group">
+                  <select id="id_contrato" class="form-select input-custom" required>
+                    <option value="" disabled selected>Cargando contratos de la API...</option>
+                  </select>
+                  <button class="btn btn-outline-success fw-bold text-uppercase px-3" style="font-size: 13px;" type="button" data-bs-toggle="modal" data-bs-target="#modalNuevoContrato">
+                    <i class="bi bi-plus-lg"></i> Nuevo
+                  </button>
+                </div>
+              </div>
+
+              <div class="d-flex flex-column flex-sm-row gap-3 pt-3 border-top border-secondary mt-2">
+                <button type="submit" id="btn-guardar" class="btn btn-update w-100 py-2.5 text-uppercase">
+                  <i class="bi bi-floppy-fill me-2"></i>Actualizar Datos
+                </button>
+                <a href="/routes/personal/entrenadores/entrenadoresList.html" class="btn btn-cancel w-100 py-2.5 fw-bold text-decoration-none text-center">
+                  <i class="bi bi-x-circle me-2"></i>Cancelar
+                </a>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalNuevoContrato" tabindex="-1" aria-labelledby="modalContratoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content modal-content-dark">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="modalContratoLabel"><i class="bi bi-file-earmark-medical text-neon me-2"></i> REGISTRAR NUEVO CONTRATO</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="form-nuevo-contrato">
+          <div class="modal-body">
+            <div id="modal-alert-container"></div>
+
+            <div class="mb-3">
+              <label for="fecha_contratacion" class="form-label">Fecha de Contratación</label>
+              <input type="date" id="fecha_contratacion" class="form-control input-custom" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="fecha_vigencia" class="form-label">Fecha de Vigencia (Fin de Contrato)</label>
+              <input type="date" id="fecha_vigencia" class="form-control input-custom" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="sueldo" class="form-label">Sueldo Mensual (BOB)</label>
+              <input type="number" id="sueldo" class="form-control input-custom" placeholder="Ej: 3500" required min="1">
+            </div>
+
+            <div class="mb-3">
+              <label for="detalles" class="form-label">Detalles / Cláusulas del Contrato</label>
+              <textarea id="detalles" class="form-control input-custom" rows="3" placeholder="Ej: Contrato de planta - Turno Completo..." required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary fw-bold px-3" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" id="btn-guardar-contrato" class="btn btn-success fw-bold px-4">GUARDAR CONTRATO</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalNuevaEspecialidad" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content modal-content-dark">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold"><i class="bi bi-award-fill text-neon me-2"></i> NUEVA ESPECIALIDAD</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="form-nueva-especialidad">
+          <div class="modal-body">
+            <div id="especialidad-alert-container"></div>
+
+            <div class="mb-3">
+              <label class="form-label" for="nombre_especialidad">Nombre de la Especialidad</label>
+              <input type="text" id="nombre_especialidad" class="form-control input-custom" placeholder="Ej: Spinning, Zumba, Crossfit" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary fw-bold px-3" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" id="btn-guardar-especialidad" class="btn btn-success fw-bold px-4">GUARDAR</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const entrenadorId = urlParams.get('id');
+
+    const API_ENTRENADORES_BASE = "http://127.0.0.1:8000/api/personal/entrenadores";
+    const API_CONTRATOS_URL = "http://127.0.0.1:8000/api/personal/contratos";
+    const API_ESPECIALIDADES_URL = "http://127.0.0.1:8000/api/especialidades";
+    const token = localStorage.getItem('toke_usuario');
+    const rol = localStorage.getItem('usuario_rol');
+
+    const formEntrenador = document.getElementById('form-actualizar-entrenador');
+    const formContrato = document.getElementById('form-nuevo-contrato');
+    const selectContrato = document.getElementById('id_contrato');
+    const selectEspecialidad = document.getElementById('id_especialidad');
+    const btnGuardar = document.getElementById('btn-guardar');
+    const btnGuardarContrato = document.getElementById('btn-guardar-contrato');
+    const alertContainer = document.getElementById('alert-container');
+    const modalAlertContainer = document.getElementById('modal-alert-container');
+    const formEspecialidad = document.getElementById('form-nueva-especialidad');
+    const especialidadAlertContainer = document.getElementById('especialidad-alert-container');
+    const btnGuardarEspecialidad = document.getElementById('btn-guardar-especialidad');
+    
+    // Sincronización de seguridad unificada
+    if (!token || (rol !== 'personal' && rol !== 'Administrador' && rol !== 'Recepcionista')) {
+      window.location.href = "/login.html";
+    }
+    if (!entrenadorId) {
+      alert("Falta el ID del entrenador a actualizar.");
+      window.location.href = "/routes/personal/entrenadores/entrenadoresList.html";
+    }
+
+    function getAuthHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await cargarContratos();
+      await cargarEspecialidades();
+      await obtenerDatosEntrenador();
+    });
+
+    async function cargarContratos(idPreseleccionado = null) {
+      try {
+        const response = await fetch(API_CONTRATOS_URL, {
+          method: 'GET',
+          headers: getAuthHeaders()
+        });
+        if (!response.ok) throw new Error("Falla al leer la base de contratos.");
+
+        const contratos = await response.json();
+        selectContrato.innerHTML = '<option value="" disabled selected>-- Elige un contrato laboral --</option>';
+        contratos.forEach(c => {
+          selectContrato.innerHTML += `
+                    <option value="${c.id_Contrato}">
+                        Sueldo: ${c.Sueldo} BOB | Detalles: ${c.Detalles}
+                    </option>
+                `;
+        });
+
+        if (idPreseleccionado) {
+          selectContrato.value = idPreseleccionado;
+        }
+      } catch (error) {
+        console.error(error);
+        mostrarAlerta("Error de red al cargar el catálogo de contratos.", "danger");
+      }
+    }
+
+    async function cargarEspecialidades(idPreseleccionado = null) {
+      try {
+        const response = await fetch(API_ESPECIALIDADES_URL, {
+          method: 'GET',
+          headers: getAuthHeaders()
+        });
+
+        if (!response.ok) throw new Error();
+
+        const especialidades = await response.json();
+        selectEspecialidad.innerHTML = `<option value="" disabled selected>-- Seleccione una especialidad --</option>`;
+
+        especialidades.forEach(e => {
+          selectEspecialidad.innerHTML += `
+                <option value="${e.id_Especialidad}">
+                    ${e.nombre_Especialidad}
+                </option>
+            `;
+        });
+
+        if (idPreseleccionado) {
+          selectEspecialidad.value = idPreseleccionado;
+        }
+      } catch (error) {
+        mostrarAlerta('No se pudieron cargar las especialidades.', 'danger');
+      }
+    }
+
+    async function obtenerDatosEntrenador() {
+      try {
+        const response = await fetch(`${API_ENTRENADORES_BASE}/${entrenadorId}`, {
+          method: 'GET',
+          headers: getAuthHeaders()
+        });
+
+        if (!response.ok) throw new Error("No se pudo obtener el expediente del entrenador.");
+
+        const data = await response.json();
+        const info = data.entrenador || data;
+
+        if (info && info.usuario) {
+          document.getElementById('nombre').value = info.usuario.Nombre || '';
+          document.getElementById('paterno').value = info.usuario.Paterno || '';
+          document.getElementById('materno').value = info.usuario.Materno || '';
+          document.getElementById('telefono').value = info.usuario.Telefono || '';
+          document.getElementById('correo').value = info.usuario.Correo_Electronico || '';
+          
+          if (info.id_Especialidad) {
+            selectEspecialidad.value = info.id_Especialidad;
+          }
+          if (info.id_Contrato) {
+            selectContrato.value = info.id_Contrato;
+          }
+        }
+      } catch (error) {
+        console.error(error);
+        mostrarAlerta(`No se pudieron cargar los datos actuales del instructor: ${error.message}`, "danger");
+      }
+    }
+
+    formContrato.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btnGuardarContrato.disabled = true;
+
+      const payloadContrato = {
+        "Fecha_Contratacion": `${document.getElementById('fecha_contratacion').value} 00:00:00`,
+        "Fecha_Vigencia": `${document.getElementById('fecha_vigencia').value} 00:00:00`,
+        "Sueldo": parseInt(document.getElementById('sueldo').value),
+        "detalles": document.getElementById('detalles').value.trim()
+      };
+
+      try {
+        const response = await fetch(API_CONTRATOS_URL, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payloadContrato)
+        });
+
+        const resData = await response.json().catch(() => ({}));
+
+        if (response.ok || response.status === 201) {
+          formContrato.reset();
+          modalAlertContainer.innerHTML = "";
+
+          const modalElement = document.getElementById('modalNuevoContrato');
+          bootstrap.Modal.getInstance(modalElement).hide();
+
+          const nuevoId = resData.id_Contrato || null;
+          await cargarContratos(nuevoId);
+
+          mostrarAlerta("¡Nuevo contrato generado y asociado con éxito!", "success");
+        } else {
+          throw new Error(resData.message || "No se pudo crear el contrato en la base de datos.");
+        }
+      } catch (error) {
+        modalAlertContainer.innerHTML = `<div class="alert alert-danger fw-bold small py-2 mb-0">❌ Error: ${error.message}</div>`;
+      } finally {
+        btnGuardarContrato.disabled = false;
+      }
+    });
+
+    formEspecialidad.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        btnGuardarEspecialidad.disabled = true;
+
+        const payload = {
+          nombre_Especialidad: document.getElementById('nombre_especialidad').value.trim()
+        };
+
+        try {
+          const response = await fetch(API_ESPECIALIDADES_URL, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(payload)
+              });
+
+          const resData = await response.json();
+
+          if (response.ok || response.status === 201) {
+            formEspecialidad.reset();
+            bootstrap.Modal.getInstance(document.getElementById('modalNuevaEspecialidad')).hide();
+
+            await cargarEspecialidades(resData.especialidad.id_Especialidad);
+            mostrarAlerta('Especialidad creada correctamente.', 'success');
+          } else {
+            throw new Error(resData.message);
+          }
+        } catch (error) {
+          especialidadAlertContainer.innerHTML = `<div class="alert alert-danger fw-bold small py-2 mb-0">❌ Error: ${error.message}</div>`;
+        } finally {
+          btnGuardarEspecialidad.disabled = false;
+        }
+      }
+    );
+
+    formEntrenador.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      btnGuardar.disabled = true;
+      btnGuardar.textContent = "Guardando Cambios...";
+
+      const passValue = document.getElementById('contrasena').value;
+
+      const payload = {
+        "Nombre": document.getElementById('nombre').value.trim(),
+        "Paterno": document.getElementById('paterno').value.trim(),
+        "Materno": document.getElementById('materno').value.trim(),
+        "Telefono": document.getElementById('telefono').value.toString(),
+        "Correo_Electronico": document.getElementById('correo').value.trim(),
+        "id_Especialidad": parseInt(selectEspecialidad.value),
+        "id_Contrato": parseInt(selectContrato.value)
+      };
+
+      if (passValue.trim() !== "") {
+        payload["Contraseña"] = passValue;
+        payload["Contraseña_confirmation"] = passValue;
+      }
+
+      try {
+        const response = await fetch(`${API_ENTRENADORES_BASE}/${entrenadorId}`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+
+        const jsonResponse = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+          mostrarAlerta("¡Los datos del instructor han sido actualizados exitosamente!", "success");
+          setTimeout(() => {
+            window.location.href = "/routes/personal/entrenadores/entrenadoresList.html";
+          }, 2000);
+        } else {
+          let msgError = jsonResponse.message || "Error en el servidor al intentar modificar.";
+          if (jsonResponse.errors) {
+            msgError = Object.values(jsonResponse.errors).flat().join("<br>");
+          }
+          throw new Error(msgError);
+        }
+      } catch (error) {
+        console.error(error);
+        mostrarAlerta(`⚠️ Error al procesar la actualización: ${error.message}`, "danger");
+        btnGuardar.disabled = false;
+        btnGuardar.textContent = "Actualizar Datos";
+      }
+    });
+
+    function mostrarAlerta(mensaje, tipo) {
+      alertContainer.innerHTML = `
+            <div class="alert alert-${tipo} alert-dismissible fade show fw-bold text-center border-0 shadow-lg" role="alert">
+                <div>${mensaje}</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

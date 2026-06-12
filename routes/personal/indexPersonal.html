@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BODY XTREME - Staff y Administración</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilos.css">
+
+  <style>
+    body { font-family: 'Montserrat', sans-serif; }
+
+    .fondo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    .fondo img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.85); /* Un poco más oscuro para que resalte el neón */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      position: fixed; top: 0; left: -300px; width: 300px; height: 100vh;
+      background: linear-gradient(180deg, #050505 0%, #0a1f12 100%);
+      color: #fff; transition: all 0.3s ease-in-out; padding-top: 20px;
+      z-index: 1100; border-right: 2px solid #00ff88;
+      box-shadow: 5px 0 25px rgba(0, 255, 136, 0.1);
+      display: flex; flex-direction: column;
+    }
+    .sidebar.active { left: 0; }
+
+    #menu-roles-container { flex-grow: 1; overflow-y: auto; margin-top: 15px; }
+    .sidebar a {
+      display: flex; align-items: center; padding: 16px 25px; color: #e0e0e0;
+      text-decoration: none; font-size: 1rem; font-weight: 600;
+      transition: all 0.2s ease; border-left: 4px solid transparent;
+    }
+    .sidebar a:hover {
+      background: rgba(0, 255, 136, 0.1); color: #00ff88;
+      border-left: 4px solid #00ff88; padding-left: 30px;
+    }
+
+    #closeSidebar {
+      font-size: 24px; color: #fff; cursor: pointer; align-self: flex-end;
+      margin-right: 20px; transition: 0.3s;
+    }
+    #closeSidebar:hover { color: #dc3545; transform: scale(1.1); }
+
+    .sidebar .logout { padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+    .btn-danger-custom { background: transparent; border: 1px solid #dc3545; color: #dc3545; transition: all 0.3s; }
+    .btn-danger-custom:hover { background: #dc3545; color: white; transform: translateY(-2px); }
+
+    /* --- HEADER --- */
+    header {
+      background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(10px);
+      padding: 15px 25px; display: flex; justify-content: space-between;
+      align-items: center; border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .hamburger {
+      font-size: 26px; cursor: pointer; color: #000; background: #00ff88;
+      border-radius: 8px; padding: 5px 12px; transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 255, 136, 0.3);
+    }
+    .hamburger:hover { background: #00cc6c; transform: translateY(-2px); }
+    .logo-header { font-weight: 900; font-size: 1.5rem; font-style: italic; letter-spacing: 1px; margin: 0; color: #ffffff; }
+    .text-neon { color: #00ff88; text-shadow: 0 0 8px rgba(0, 255, 136, 0.4); }
+    .user-info img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #00ff88; object-fit: cover; }
+
+    /* --- CONTENIDO PRINCIPAL / DASHBOARD --- */
+    .titulo-moderno {
+      font-size: 2.8rem; font-weight: 900; letter-spacing: -1px;
+      text-transform: uppercase; text-shadow: 4px 4px 15px rgba(0, 0, 0, 0.9);
+      color: #ffffff; line-height: 1.1;
+    }
+
+    /* Tarjetas KPI (Estadísticas rápidas) */
+    .kpi-card {
+      background: linear-gradient(135deg, rgba(20,20,20,0.9) 0%, rgba(10,10,10,0.95) 100%);
+      border-left: 4px solid #00ff88;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+      transition: transform 0.3s ease;
+    }
+    .kpi-card:hover { transform: translateY(-3px); }
+
+    /* Tarjetas de Módulos (Clicables) */
+    .module-card {
+      display: block;
+      background: rgba(15, 15, 15, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 255, 136, 0.15);
+      border-radius: 16px;
+      padding: 30px 20px;
+      height: 100%;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .module-card::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+      background: linear-gradient(to right, transparent, rgba(0,255,136,0.1), transparent);
+      transform: skewX(-20deg); transition: all 0.5s ease;
+    }
+    .module-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0, 255, 136, 0.2);
+      border-color: #00ff88;
+      background: rgba(20, 20, 20, 0.9);
+    }
+    .module-card:hover::before { left: 200%; }
+    
+    .module-icon {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: rgba(0, 255, 136, 0.1);
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-bottom: 15px; color: #00ff88; font-size: 1.8rem;
+      transition: all 0.3s ease;
+    }
+    .module-card:hover .module-icon {
+      background: #00ff88; color: #000; box-shadow: 0 0 15px rgba(0,255,136,0.5);
+    }
+
+    .bg-dark-custom { background-color: rgba(12, 12, 12, 0.98) !important; }
+  </style>
+</head>
+
+<body>
+
+  <div class="fondo">
+    <img src="/images/fondoPersonal.png" alt="Fondo Gimnasio">
+  </div>
+
+  <div class="overlay">
+
+    <header>
+      <div class="d-flex align-items-center gap-3">
+        <div class="hamburger" id="hamburger"><i class="bi bi-list"></i></div>
+        <h2 class="logo-header d-none d-sm-block">BODY <span class="text-neon">XTREME</span></h2>
+      </div>
+
+      <div class="user-info d-flex align-items-center gap-3" id="user-header-container">
+        <div id="auth-dinamico" class="text-end d-none d-sm-block">
+          <span class="placeholder-glow"><span class="placeholder col-12 bg-secondary"></span></span>
+        </div>
+        <img src="/images/usuario.png" alt="Usuario">
+      </div>
+    </header>
+
+    <div class="sidebar" id="sidebar">
+      <div id="closeSidebar"><i class="bi bi-x-lg"></i></div>
+
+      <div class="px-4 text-center border-bottom pb-3 border-secondary">
+        <h4 class="fw-bold m-0" style="color: #00ff88; font-style: italic;">STAFF PANEL</h4>
+      </div>
+
+      <div id="menu-roles-container"></div>
+
+      <div class="logout">
+        <button id="btn-logout" class="btn btn-danger-custom w-100 py-2 fw-bold" style="display: none;">
+          <i class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión
+        </button>
+      </div>
+    </div>
+
+    <div class="container mt-4 mb-5 flex-grow-1">
+
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 border-bottom border-secondary pb-3">
+        <div>
+            <h1 class="titulo-moderno m-0 text-center text-md-start">
+                Panel de <span class="text-neon">Control</span>
+            </h1>
+            <p class="text-white-50 m-0 mt-2 text-center text-md-start">Resumen de operaciones y acceso a módulos de gestión.</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <span class="badge border border-success text-success px-3 py-2 fs-6"><i class="bi bi-circle-fill small me-2"></i>Sistema Activo</span>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-5">
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card d-flex align-items-center">
+                <i class="bi bi-people fs-1 text-white-50 me-3"></i>
+                <div>
+                    <p class="text-white-50 small text-uppercase m-0 fw-bold">Socios Activos</p>
+                    <h3 class="text-white m-0 fw-bold">Gestión</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card d-flex align-items-center" style="border-color: #0dcaf0;">
+                <i class="bi bi-card-checklist fs-1 text-white-50 me-3"></i>
+                <div>
+                    <p class="text-white-50 small text-uppercase m-0 fw-bold">Planes</p>
+                    <h3 class="text-white m-0 fw-bold">Activos</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card d-flex align-items-center" style="border-color: #ffc107;">
+                <i class="bi bi-calendar-check fs-1 text-white-50 me-3"></i>
+                <div>
+                    <p class="text-white-50 small text-uppercase m-0 fw-bold">Clases</p>
+                    <h3 class="text-white m-0 fw-bold">Hoy</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="kpi-card d-flex align-items-center" style="border-color: #6610f2;">
+                <i class="bi bi-tools fs-1 text-white-50 me-3"></i>
+                <div>
+                    <p class="text-white-50 small text-uppercase m-0 fw-bold">Equipos</p>
+                    <h3 class="text-white m-0 fw-bold">Óptimos</h3>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <h4 class="text-white fw-bold mb-4"><i class="bi bi-grid-1x2-fill text-neon me-2"></i>Módulos de Administración</h4>
+
+      <div class="row g-4 justify-content-center">
+
+        <div class="col-md-6 col-lg-4">
+          <a href="/routes/personal/clientes/clientesList.html" class="module-card text-center">
+            <div class="module-icon"><i class="bi bi-person-lines-fill"></i></div>
+            <h4 class="text-white fw-bold">Gestión de Clientes</h4>
+            <p class="text-white-50 small mb-0 mt-2">Inscripciones, edición de perfiles, control de acceso y revisión de estado.</p>
+          </a>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+          <a href="/routes/personal/membresia/membresiaList.html" class="module-card text-center">
+            <div class="module-icon"><i class="bi bi-cash-coin"></i></div>
+            <h4 class="text-white fw-bold">Membresías y Pagos</h4>
+            <p class="text-white-50 small mb-0 mt-2">Renovación de planes, registro de transacciones e historial financiero.</p>
+          </a>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+          <a href="/routes/personal/horarios/horarioclaseList.html" class="module-card text-center">
+            <div class="module-icon"><i class="bi bi-calendar-week"></i></div>
+            <h4 class="text-white fw-bold">Horarios y Clases</h4>
+            <p class="text-white-50 small mb-0 mt-2">Organización de la grilla semanal, cupos y programación de actividades.</p>
+          </a>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+          <a href="/routes/personal/entrenadores/entrenadoresList.html" class="module-card text-center">
+            <div class="module-icon"><i class="bi bi-person-vcard"></i></div>
+            <h4 class="text-white fw-bold">Staff Entrenadores</h4>
+            <p class="text-white-50 small mb-0 mt-2">Administración de instructores, asignaciones, especialidades y contactos.</p>
+          </a>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+          <a href="/routes/personal/maquinas/maquinasList.html" class="module-card text-center">
+            <div class="module-icon"><i class="bi bi-gear-wide-connected"></i></div>
+            <h4 class="text-white fw-bold">Inventario Equipos</h4>
+            <p class="text-white-50 small mb-0 mt-2">Control de maquinaria, registro de mantenimiento y estados físicos.</p>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <footer class="mt-auto py-4 bg-dark-custom border-top border-secondary text-center text-md-start">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-7 mb-3 mb-md-0">
+            <h4 class="fw-bold text-white mb-2" style="font-style: italic;">BODY <span class="text-neon">XTREME</span></h4>
+            <p class="text-white-50 small mb-0">Panel de Administración y Gestión Exclusivo para Staff.</p>
+          </div>
+          <div class="col-md-5 text-md-end">
+            <p class="text-white-50 small mb-0">© 2026 Todos los derechos reservados.</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const closeSidebar = document.getElementById('closeSidebar');
+
+    hamburger.addEventListener('click', () => { sidebar.classList.add('active'); });
+    closeSidebar.addEventListener('click', () => { sidebar.classList.remove('active'); });
+
+    document.addEventListener('click', (e) => {
+      if (!sidebar.contains(e.target) && !hamburger.contains(e.target) && sidebar.classList.contains('active')) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('toke_usuario');
+      const rolUsuario = localStorage.getItem('usuario_rol');
+      const nombreUsuario = localStorage.getItem('nombre_usuario') || 'Usuario';
+
+      const authContainer = document.getElementById('auth-dinamico');
+      const menuContainer = document.getElementById('menu-roles-container');
+      const btnLogout = document.getElementById('btn-logout');
+
+      if (!token) {
+        authContainer.innerHTML = `
+                <a href="/login.html" class="btn btn-outline-light btn-sm fw-bold px-3 border-2" style="color: #00ff88; border-color: #00ff88;">LOGIN</a>
+            `;
+        menuContainer.innerHTML = `
+                <p class="text-white-50 small px-4 py-3" style="font-style: italic;">Inicia sesión para ver tus opciones.</p>
+            `;
+        btnLogout.style.display = 'none';
+        return;
+      }
+
+      btnLogout.style.display = 'block';
+      authContainer.innerHTML = `
+            <span class="fw-bold text-white small text-uppercase">${nombreUsuario}</span><br>
+            <span class="text-neon" style="font-size: 0.8rem;">${rolUsuario}</span>
+        `;
+
+      let htmlMenu = `
+            <a href="/routes/personal/indexPersonal.html">
+              <i class="bi bi-house-door me-2"></i> Inicio
+            </a>
+        `;
+
+      if (rolUsuario === 'personal') {
+        htmlMenu += `
+                <a href="/routes/personal/clientes/clientesList.html"><i class="bi bi-people me-2"></i> Clientes</a>
+                <a href="/routes/personal/entrenadores/entrenadoresList.html"><i class="bi bi-person-vcard me-2"></i> Entrenadores</a>
+                <a href="/routes/personal/membresia/membresiaList.html"><i class="bi bi-card-checklist me-2"></i> Membresías</a>
+                <a href="/routes/personal/maquinas/maquinasList.html"><i class="bi bi-tools me-2"></i> Maquinaria</a>
+                <a href="/routes/personal/horarios/horarioclaseList.html"><i class="bi bi-calendar-week me-2"></i> Horarios/Clases</a>
+                
+                <a href="verPerfilPersonal.html" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); color: #00ff88;">
+                    <i class="bi bi-person-badge me-2"></i> Mi Perfil
+                </a>
+            `;
+      } else if (rolUsuario === 'entrenador') {
+        htmlMenu += `
+                <a href="indexEntrenador.html"><i class="bi bi-speedometer2 me-2"></i> Panel Entrenador</a>
+                <a href="actualizar_entrenador.html"><i class="bi bi-person-gear me-2"></i> Actualizar Perfil</a>
+            `;
+      } else if (rolUsuario === 'cliente') {
+        htmlMenu += `
+                <a href="mis_datos_cliente.html"><i class="bi bi-person-badge me-2"></i> Mis Datos</a>
+            `;
+      }
+
+      menuContainer.innerHTML = htmlMenu;
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = '/index.html';
+    });
+  </script>
+</body>
+
+</html>

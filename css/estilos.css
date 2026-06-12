@@ -1,0 +1,232 @@
+/* --- CONFIGURACIÓN GENERAL --- */
+/* --- CONFIGURACIÓN GENERAL CORREGIDA --- */
+body, html {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  font-family: 'Montserrat', sans-serif;
+  color: #fff;
+}
+/* --- CAPAS DE FONDO --- */
+.fondo {
+  position: fixed;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.fondo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.overlay {
+  background: rgba(0, 0, 0, 0.7);
+  min-height: 100vh;
+  padding-bottom: 50px;
+}
+
+/* --- HEADER Y NAVEGACIÓN --- */
+header {
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid #00ff88;
+}
+
+.user-info img {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  border: 2px solid #00ff88; 
+}
+
+.user-info span {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* --- TIPOGRAFÍAS Y SECCIONES --- */
+.titulo-principal {
+  text-align: center;
+  margin: 40px 0;
+  font-weight: bold;
+  color: white;
+  text-shadow: 3px 3px 6px rgba(0,0,0,0.9);
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 140px;
+}
+
+.section {
+  margin-bottom: 80px;
+}
+
+.section h2 {
+  color: #00ff88;
+  font-weight: 700;
+  font-size: 2.2rem;
+}
+
+.section p {
+  font-size: 1.3rem;
+  color: #fff;
+}
+
+.section img {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+  transition: transform 0.3s ease;
+}
+
+/* Efecto hover interactivo para las imágenes */
+.section img:hover {
+  transform: scale(1.02);
+}
+
+/* --- RESPONSIVE DESIGN (MEDIA QUERIES) --- */
+@media (max-width: 992px) {
+  .titulo-principal {
+    font-size: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .titulo-principal {
+    font-size: 50px;
+    margin: 20px 0;
+  }
+  .section h2 {
+    font-size: 1.6rem;
+    margin-top: 15px;
+  }
+  .section p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .titulo-principal {
+    font-size: 35px;
+  }
+}
+
+/* --- ESTILOS PARA LAS TABLAS DEL PANEL (CORREGIDO) --- */
+.bg-dark-custom {
+  background: rgba(15, 15, 15, 0.85) !important;
+  border: 1px solid rgba(0, 255, 136, 0.2) !important;
+}
+
+/* Selector generalizado por clase para que aplique a todas las tablas del panel */
+.table-custom {
+  background-color: transparent !important;
+  color: #ffffff !important;
+}
+
+.table-custom thead th {
+  color: #00ff88 !important; /* Verde neón corporativo */
+  border-bottom: 2px solid #00ff88 !important;
+  background-color: rgba(20, 20, 20, 0.9) !important; /* Fondo oscuro sólido para el header */
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+
+.table-custom tbody tr {
+  background-color: transparent !important;
+  transition: background-color 0.2s ease;
+}
+
+.table-custom tbody td {
+  color: #e0e0e0 !important;
+  background-color: transparent !important; /* Evita que Bootstrap pinte las celdas de blanco */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  vertical-align: middle;
+}
+
+/* El efecto cebra (striped) personalizado con opacidad neón */
+.table-custom.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+.table-custom tbody tr:hover {
+  background-color: rgba(0, 255, 136, 0.06) !important; /* Destello neón al pasar el mouse */
+}
+
+/* --- ESTILOS COMPLEMENTARIOS PARA LA PANTALLA DE LOGIN --- */
+.card-login {
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 255, 136, 0.15) !important;
+}
+
+.border-bottom-neon {
+  border-bottom: 2px solid #00ff88 !important;
+  background: transparent !important;
+}
+
+.login-subtitulo {
+  color: #00ff88;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  font-size: 1.6rem;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+/* Inputs oscuros con enfoque neón */
+.input-custom {
+  background-color: rgba(20, 20, 20, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+  padding: 10px 12px;
+  transition: all 0.3s ease;
+}
+
+.input-custom:focus {
+  background-color: rgba(30, 30, 30, 0.9) !important;
+  border-color: #00ff88 !important;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.4) !important;
+  outline: none;
+}
+
+/* Botón Neón Sólido */
+.btn-neon {
+  background-color: #00ff88;
+  color: #000;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-neon:hover {
+  background-color: #00cc6c;
+  color: #000;
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+  transform: translateY(-1px);
+}
+
+.btn-neon:disabled {
+  background-color: #555;
+  color: #888;
+}
+
+/* Color gris claro brillante para los placeholders */
+.input-custom::placeholder {
+  color: rgba(240, 240, 240, 0.75) !important;
+  opacity: 1; /* Necesario en Firefox */
+}
+
+/* Opcional: Asegurar que el texto que escribe el usuario sea blanco puro */
+.input-custom {
+  color: #ffffff !important;
+}

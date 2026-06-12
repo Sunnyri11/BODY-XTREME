@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BODY XTREME - Clases y Calendario</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilos.css">
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #050505;
+      color: #fff;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    /* Fondo Premium */
+    .fondo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .fondo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.6;
+    }
+
+    .overlay {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      background: rgba(10, 10, 10, 0.85);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sidebar Estandarizado */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 300px;
+      height: 100vh;
+      background: linear-gradient(180deg, #050505 0%, #0a1f12 100%);
+      color: #fff;
+      transition: all 0.3s ease-in-out;
+      z-index: 1100;
+      border-right: 2px solid #00ff88;
+      display: flex;
+      flex-direction: column;
+      padding-top: 20px;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    #menu-roles-container {
+      flex-grow: 1;
+      overflow-y: auto;
+      margin-top: 15px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      padding: 16px 25px;
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      border-left: 4px solid transparent;
+    }
+
+    .sidebar a:hover {
+      background: rgba(0, 255, 136, 0.1);
+      color: #00ff88;
+      border-left: 4px solid #00ff88;
+      padding-left: 30px;
+    }
+
+    #closeSidebar {
+      font-size: 24px;
+      color: #fff;
+      cursor: pointer;
+      align-self: flex-end;
+      margin-right: 20px;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+
+    #closeSidebar:hover {
+      color: #dc3545;
+      transform: scale(1.1);
+    }
+
+    .logout {
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Header y Botón Hamburguesa */
+    header {
+      background: rgba(10, 10, 10, 0.85);
+      padding: 15px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+    }
+
+    .hamburger {
+      font-size: 26px;
+      cursor: pointer;
+      color: #000;
+      background: #00ff88;
+      border-radius: 8px;
+      padding: 5px 12px;
+      transition: 0.3s;
+    }
+
+    .hamburger:hover {
+      transform: scale(1.05);
+    }
+
+    .logo-header {
+      font-weight: 900;
+      font-size: 1.5rem;
+      font-style: italic;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .text-neon {
+      color: #00ff88;
+    }
+
+    /* Contenedores y Dashboard */
+    .card-custom {
+      background: rgba(15, 15, 15, 0.85);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+    }
+
+    .titulo-moderno {
+      font-size: 2rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+
+    /* Tabs Personalizadas */
+    .nav-tabs-custom {
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-tabs-custom .nav-link {
+      color: #aaa;
+      font-weight: 700;
+      border: none;
+      padding: 12px 25px;
+      text-transform: uppercase;
+      background: transparent;
+      transition: 0.3s;
+    }
+
+    .nav-tabs-custom .nav-link.active {
+      color: #00ff88 !important;
+      border-bottom: 3px solid #00ff88 !important;
+      background: rgba(0, 255, 136, 0.05) !important;
+    }
+
+    .nav-tabs-custom .nav-link:hover {
+      color: #fff;
+    }
+
+    /* Buscador Contrastado */
+    .search-input-custom {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border: 2px solid #444 !important;
+      color: #000 !important;
+      padding: 12px 15px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .search-input-custom::placeholder {
+      color: #555 !important;
+      font-weight: 400;
+    }
+
+    /* Tablas */
+    .table-custom thead th {
+      background-color: #0a0a0a !important;
+      color: #00ff88 !important;
+      border-bottom: 2px solid #00ff88 !important;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      padding: 15px;
+    }
+
+    .table-custom tbody tr:hover {
+      background-color: rgba(0, 255, 136, 0.05) !important;
+    }
+
+    /* Botones de Acción (Consistentes) */
+    .btn-registrar-destacado {
+      background-color: transparent;
+      color: #00ff88;
+      border: #00ff88 solid 2px;
+      font-weight: 900;
+      padding: 10px 25px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+      text-decoration: none;
+    }
+
+    .btn-registrar-destacado:hover {
+      background-color: #00ff88;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 255, 136, 0.5);
+      color: #000;
+    }
+
+    .btn-actualizar {
+      background: #ffc107;
+      color: #000;
+      border: none;
+      font-weight: 700;
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 6px;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+
+    .btn-actualizar:hover {
+      background: #e0a800;
+      transform: scale(1.05);
+      color: #000;
+    }
+
+    .btn-eliminar {
+      background: #dc3545;
+      color: #fff;
+      border: none;
+      font-weight: 700;
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 6px;
+      transition: 0.3s;
+    }
+
+    .btn-eliminar:hover {
+      background: #c82333;
+      transform: scale(1.05);
+    }
+
+    /* Paginación Oscura */
+    .pagination .page-link {
+      background-color: #111;
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .pagination .page-link:hover {
+      background-color: rgba(0, 255, 136, 0.1);
+      color: #00ff88;
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: #00ff88;
+      border-color: #00ff88;
+      color: #000;
+    }
+
+    .pagination .page-item.disabled .page-link {
+      background-color: #050505;
+      color: #555;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="fondo">
+    <img src="/images/fondo.jpg" alt="Fondo Gimnasio">
+  </div>
+
+  <div class="overlay">
+
+    <header>
+      <div class="d-flex align-items-center gap-3">
+        <div class="hamburger" id="hamburger"><i class="bi bi-list"></i></div>
+        <h2 class="logo-header">BODY <span class="text-neon">XTREME</span></h2>
+      </div>
+      <div class="user-info d-flex align-items-center gap-3">
+        <div class="text-end d-none d-md-block">
+          <span class="d-block fw-bold" id="nombre-usuario">Cargando...</span>
+        </div>
+        <img src="/images/usuario.png" alt="Usuario"
+          style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid #00ff88; object-fit: cover;">
+      </div>
+    </header>
+
+    <div class="sidebar" id="sidebar">
+      <a href="#" class="close-btn" id="closeSidebar"><i class="bi bi-x-lg"></i></a>
+      <div class="px-4 text-center border-bottom pb-3 mb-2 border-secondary text-neon fw-bold">STAFF PANEL</div>
+      <div id="menu-roles-container"></div>
+      <div class="logout">
+        <button id="btn-logout" class="btn btn-outline-danger w-100 fw-bold"><i
+            class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión</button>
+      </div>
+    </div>
+
+    <div class="container-fluid px-4 mt-4 mb-5 flex-grow-1">
+      <div id="alert-container"></div>
+
+      <div class="card-custom">
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+          <h2 class="titulo-moderno m-0"><i class="bi bi-calendar-event text-neon me-2"></i>Clases y <span
+              class="text-neon">Horarios</span></h2>
+          <div class="w-100" style="max-width: 400px;">
+            <input type="text" id="buscador-clase" class="form-control search-input-custom"
+              placeholder="🔍 Buscar por nombre de clase...">
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs nav-tabs-custom mb-4" id="gymTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="clases-tab" data-bs-toggle="tab" data-bs-target="#panel-clases"
+              type="button" role="tab">
+              <i class="bi bi-journal-bookmark-fill me-2"></i>Catálogo de Clases
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="horarios-tab" data-bs-toggle="tab" data-bs-target="#panel-horarios"
+              type="button" role="tab">
+              <i class="bi bi-clock-fill me-2"></i>Cronograma General
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="gymTabsContent">
+
+          <div class="tab-pane fade show active" id="panel-clases" role="tabpanel">
+            <div
+              class="d-flex flex-column flex-md-row justify-content-between align-items-md-center border-bottom border-secondary pb-3 mb-4 gap-3">
+              <h4 class="text-white text-uppercase fw-bold m-0">Especialidades del Gym</h4>
+              <a href="registrar_clase.html" class="btn btn-registrar-destacado"><i class="bi bi-plus-lg me-2"></i>Nueva
+                Clase</a>
+            </div>
+
+            <div class="table-responsive border border-secondary border-opacity-25 rounded">
+              <table class="table table-dark table-custom text-center align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th width="10%">ID</th>
+                    <th width="25%">Nombre de la Clase</th>
+                    <th width="40%">Descripción</th>
+                    <th width="10%">Cupo</th>
+                    <th width="15%">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-clases">
+                  <tr>
+                    <td colspan="5" class="py-4 text-white-50">Cargando catálogo deportivo...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="d-flex justify-content-center mt-4" id="paginacion-clases"></div>
+          </div>
+
+          <div class="tab-pane fade" id="panel-horarios" role="tabpanel">
+            <div
+              class="d-flex flex-column flex-md-row justify-content-between align-items-md-center border-bottom border-secondary pb-3 mb-4 gap-3">
+              <h4 class="text-white text-uppercase fw-bold m-0" style="color: #f1c40f !important;">Asignación de
+                Horarios</h4>
+              <a href="registrar_horario.html" class="btn btn-registrar-destacado"
+                style="background-color: #ffc107; box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);"><i
+                  class="bi bi-calendar-plus me-2"></i>Asignar Horario</a>
+            </div>
+
+            <div class="table-responsive border border-secondary border-opacity-25 rounded">
+              <table class="table table-dark table-custom text-center align-middle mb-0">
+                <thead style="border-bottom-color: #ffc107 !important;">
+                  <tr>
+                    <th style="color: #ffc107 !important;">Horario ID</th>
+                    <th style="color: #ffc107 !important;">Clase</th>
+                    <th style="color: #ffc107 !important;">Instructor</th>
+                    <th style="color: #ffc107 !important;">Día</th>
+                    <th style="color: #ffc107 !important;">Bloque Hora</th>
+                    <th style="color: #ffc107 !important;">Estado</th>
+                    <th style="color: #ffc107 !important;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-horarios">
+                  <tr>
+                    <td colspan="7" class="py-4 text-white-50">Cargando matriz horaria...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="d-flex justify-content-center mt-4" id="paginacion-horarios"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const API_CLASES_URL = "http://127.0.0.1:8000/api/personal/clases";
+    const API_CALENDARIO_URL = "http://127.0.0.1:8000/api/calendariogimnasio";
+
+    const token = localStorage.getItem('toke_usuario');
+    const rol = localStorage.getItem('usuario_rol');
+    const nombreEmpleado = localStorage.getItem('usuario_nombre') || "Personal Gym";
+
+    const alertContainer = document.getElementById('alert-container');
+    const tablaClases = document.getElementById('tabla-clases');
+    const tablaHorarios = document.getElementById('tabla-horarios');
+    const buscadorClase = document.getElementById('buscador-clase');
+
+    let listaClasesOriginal = [];
+    let listaHorariosOriginal = [];
+    const FILAS_POR_PAGINA = 5;
+    let paginaActualClases = 1;
+    let paginaActualHorarios = 1;
+
+    if (!token || (rol !== 'personal' && rol !== 'Administrador')) {
+      window.location.href = "/login.html";
+    }
+
+    function getAuthHeaders() {
+      return { 'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('nombre-usuario').textContent = nombreEmpleado;
+
+      // Inyectar Menú Lateral Standard
+      document.getElementById('menu-roles-container').innerHTML = `
+            <a href="/routes/personal/indexPersonal.html"><i class="bi bi-house-door me-2"></i> Inicio</a>
+            <a href="/routes/personal/clientes/clientesList.html"><i class="bi bi-people me-2"></i> Clientes</a>
+            <a href="/routes/personal/entrenadores/entrenadoresList.html"><i class="bi bi-person-vcard me-2"></i> Entrenadores</a>
+            <a href="/routes/personal/membresia/membresiaList.html"><i class="bi bi-card-checklist me-2"></i> Membresías</a>
+            <a href="/routes/personal/maquinas/maquinasList.html"><i class="bi bi-tools me-2"></i> Maquinaria</a>
+            <a href="/routes/personal/horarios/horarioclaseList.html" style="color: #00ff88; border-left: 4px solid #00ff88; background: rgba(0,255,136,0.1);"><i class="bi bi-calendar-week me-2"></i> Horarios/Clases</a>
+        `;
+
+      obtenerClases();
+      obtenerHorariosCalendario();
+
+      buscadorClase.addEventListener('input', () => {
+        paginaActualClases = 1;
+        paginaActualHorarios = 1;
+        procesarRenderizadoTablas();
+      });
+    });
+
+    function procesarRenderizadoTablas() {
+      const terminoBusqueda = buscadorClase.value.toLowerCase().trim();
+
+      const clasesFiltradas = listaClasesOriginal.filter(c => c.Nombre && c.Nombre.toLowerCase().includes(terminoBusqueda));
+      renderizarTablaClases(clasesFiltradas);
+
+      const horariosFiltrados = listaHorariosOriginal.filter(h => {
+        const nombreClase = h.clase ? h.clase.Nombre : `Clase ID: ${h.id_Clase}`;
+        return nombreClase.toLowerCase().includes(terminoBusqueda);
+      });
+      renderizarTablaHorarios(horariosFiltrados);
+    }
+
+    /* --- LÓGICA CLASES --- */
+    async function obtenerClases() {
+      try {
+        const response = await fetch(API_CLASES_URL, { method: 'GET', headers: getAuthHeaders() });
+        if (!response.ok) throw new Error("Fallo al obtener el catálogo de clases.");
+        listaClasesOriginal = await response.json();
+        procesarRenderizadoTablas();
+      } catch (error) {
+        tablaClases.innerHTML = `<tr><td colspan="5" class="text-danger fw-bold py-3">⚠️ Error al mapear clases.</td></tr>`;
+      }
+    }
+
+    function renderizarTablaClases(clases) {
+      if (clases.length === 0) {
+        tablaClases.innerHTML = `<tr><td colspan="5" class="text-white-50 py-4">No existen clases que coincidan con la búsqueda.</td></tr>`;
+        document.getElementById('paginacion-clases').innerHTML = '';
+        return;
+      }
+
+      const indiceInicial = (paginaActualClases - 1) * FILAS_POR_PAGINA;
+      const clasesPaginadas = clases.slice(indiceInicial, indiceInicial + FILAS_POR_PAGINA);
+
+      tablaClases.innerHTML = clasesPaginadas.map(c => `
+          <tr>
+            <td class="fw-bold text-success">#${c.id_Clase}</td>
+            <td class="fw-bold">${c.Nombre}</td>
+            <td class="text-start small text-white-50">${c.Descripción || 'Sin descripción.'}</td>
+            <td><span class="badge bg-dark border border-success text-success px-3 py-2">${c.Cupo_Maximo} Alumnos</span></td>
+            <td>
+              <div class="d-flex gap-2 justify-content-center">
+                <button class="btn-actualizar" onclick="location.href='actualizar_clase.html?id=${c.id_Clase}'"><i class="bi bi-pencil-square"></i> Actualizar</button>
+                <button class="btn-eliminar" onclick="eliminarClase(${c.id_Clase})"><i class="bi bi-trash-fill"></i> Eliminar</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+      construirPaginador('paginacion-clases', clases.length, paginaActualClases, (nuevaPagina) => {
+        paginaActualClases = nuevaPagina;
+        procesarRenderizadoTablas();
+      });
+    }
+
+    async function eliminarClase(id) {
+      if (!confirm(`¿Seguro que deseas eliminar la clase #${id}?`)) return;
+      try {
+        const response = await fetch(`${API_CLASES_URL}/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+        if (response.ok) {
+          mostrarAlerta(`Clase #${id} removida exitosamente.`, "success");
+          obtenerClases();
+          obtenerHorariosCalendario();
+        } else { throw new Error("No se pudo eliminar por restricciones de BD."); }
+      } catch (error) { mostrarAlerta(error.message, "danger"); }
+    }
+
+    /* --- LÓGICA HORARIOS --- */
+    async function obtenerHorariosCalendario() {
+      try {
+        const response = await fetch(API_CALENDARIO_URL, { method: 'GET', headers: getAuthHeaders() });
+        if (!response.ok) throw new Error("Fallo al obtener la grilla.");
+        listaHorariosOriginal = await response.json();
+        procesarRenderizadoTablas();
+      } catch (error) {
+        tablaHorarios.innerHTML = `<tr><td colspan="7" class="text-danger fw-bold py-3"> Error al mapear el cronograma.</td></tr>`;
+      }
+    }
+
+    function renderizarTablaHorarios(horarios) {
+      if (horarios.length === 0) {
+        tablaHorarios.innerHTML = `<tr><td colspan="7" class="text-white-50 py-4">No hay asignaciones que coincidan.</td></tr>`;
+        document.getElementById('paginacion-horarios').innerHTML = '';
+        return;
+      }
+
+      const indiceInicial = (paginaActualHorarios - 1) * FILAS_POR_PAGINA;
+      const horariosPaginados = horarios.slice(indiceInicial, indiceInicial + FILAS_POR_PAGINA);
+
+      tablaHorarios.innerHTML = horariosPaginados.map(h => {
+        const nombreClase = h.clase ? h.clase.Nombre : `Clase ID: ${h.id_Clase}`;
+        let nombreEntrenador = "No asignado";
+        let especialidad = "";
+        if (h.entrenador && h.entrenador.usuario) {
+          nombreEntrenador = `${h.entrenador.usuario.Nombre} ${h.entrenador.usuario.Paterno}`;
+          especialidad = h.entrenador.Especialidad || '';
+        }
+        const estadoTexto = h.estado ? h.estado.Estado : (h.id_Estado === 1 ? 'Activo' : 'Inactivo');
+
+        return `
+              <tr>
+                <td class="text-warning fw-bold">#${h.id_Horario}</td>
+                <td class="fw-bold text-white">${nombreClase}</td>
+                <td class="text-start small"><b class="text-info">${nombreEntrenador}</b><br><small class="text-white-50">${especialidad}</small></td>
+                <td><span class="badge bg-opacity-10 bg-info text-info px-2 py-1">${h.dia ? h.dia.Dia : '---'}</span></td>
+                <td><code class="text-white bg-dark px-2 py-1 rounded" style="font-size: 0.95rem;">${h.hora ? h.hora.Hora : '---'}</code></td>
+                <td><span class="badge ${estadoTexto.toLowerCase() === 'activo' ? 'bg-success' : 'bg-secondary'} px-2 py-1">${estadoTexto}</span></td>
+                <td>
+                  <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn-actualizar" onclick="location.href='actualizar_horario.html?id=${h.id_Horario}'">Actualizar</button>
+                    <button class="btn-eliminar" onclick="eliminarHorario(${h.id_Horario})">Eliminar</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+      }).join('');
+
+      construirPaginador('paginacion-horarios', horarios.length, paginaActualHorarios, (nuevaPagina) => {
+        paginaActualHorarios = nuevaPagina;
+        procesarRenderizadoTablas();
+      });
+    }
+
+    async function eliminarHorario(id) {
+      if (!confirm(`¿Remover la asignación horaria #${id}?`)) return;
+      try {
+        const response = await fetch(`${API_CALENDARIO_URL}/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
+        if (response.ok) {
+          mostrarAlerta(`Horario asignado #${id} revocado con éxito.`, "success");
+          obtenerHorariosCalendario();
+        } else { throw new Error("Fallo al ejecutar la eliminación."); }
+      } catch (error) { mostrarAlerta(error.message, "danger"); }
+    }
+
+    /* --- PAGINADOR Y EVENTOS SIDEBAR --- */
+    function construirPaginador(idContenedor, totalElementos, paginaActual, callback) {
+      const container = document.getElementById(idContenedor);
+      const total = Math.ceil(totalElementos / FILAS_POR_PAGINA);
+      if (total <= 1) { container.innerHTML = ''; return; }
+
+      let html = `<ul class="pagination pagination-sm mb-0 shadow-sm">
+            <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}"><a class="page-link btn-prev" href="#">«</a></li>`;
+      for (let i = 1; i <= total; i++) {
+        html += `<li class="page-item ${paginaActual === i ? 'active' : ''}"><a class="page-link btn-page" href="#" data-page="${i}">${i}</a></li>`;
+      }
+      html += `<li class="page-item ${paginaActual === total ? 'disabled' : ''}"><a class="page-link btn-next" href="#">»</a></li></ul>`;
+      container.innerHTML = html;
+
+      container.querySelector('.btn-prev').onclick = (e) => { e.preventDefault(); if (paginaActual > 1) callback(paginaActual - 1); };
+      container.querySelectorAll('.btn-page').forEach(b => b.onclick = (e) => { e.preventDefault(); callback(parseInt(b.dataset.page)); });
+      container.querySelector('.btn-next').onclick = (e) => { e.preventDefault(); if (paginaActual < total) callback(paginaActual + 1); };
+    }
+
+    function mostrarAlerta(mensaje, tipo) {
+      alertContainer.innerHTML = `<div class="alert alert-${tipo} alert-dismissible fade show fw-bold text-center" role="alert">${mensaje}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+    }
+
+    document.getElementById('hamburger').onclick = () => document.getElementById('sidebar').classList.add('active');
+    document.getElementById('closeSidebar').onclick = (e) => { e.preventDefault(); document.getElementById('sidebar').classList.remove('active'); };
+    document.getElementById('btn-logout').onclick = () => { localStorage.clear(); window.location.href = "/login.html"; };
+  </script>
+</body>
+
+</html>

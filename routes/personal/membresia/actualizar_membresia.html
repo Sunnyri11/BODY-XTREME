@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BODY XTREME - Editar Membresía</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilos.css">
+
+  <style>
+    body { font-family: 'Montserrat', sans-serif; background-color: #050505; color: #fff; margin: 0; overflow-x: hidden; }
+    
+    .fondo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    .fondo img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
+    .overlay { background: rgba(0, 0, 0, 0.8); min-height: 100vh; }
+
+    /* Estilo del Formulario Premium */
+    .card-custom-form {
+      background: rgba(15, 15, 15, 0.95);
+      backdrop-filter: blur(15px);
+      border: 1px solid #f1c40f; /* Borde ámbar para edición */
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(241, 196, 15, 0.1);
+    }
+    .form-label { color: #f1c40f; font-weight: 600; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 0.3rem; }
+    .input-custom {
+      background: rgba(0, 0, 0, 0.5) !important;
+      border: 1px solid #444;
+      color: #fff !important;
+      padding: 12px 15px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    .input-custom:focus { border-color: #f1c40f; box-shadow: 0 0 12px rgba(241, 196, 15, 0.3); outline: none; }
+    
+    /* Botones */
+    .btn-update { background: #f1c40f; color: #000; border: none; font-weight: 900; transition: all 0.3s ease; border-radius: 12px; padding: 12px 25px; }
+    .btn-update:hover { background: #d4ac0d; box-shadow: 0 0 20px rgba(241, 196, 15, 0.5); transform: translateY(-2px); color: #000; }
+    
+    .btn-cancel { border: 1px solid #6c757d; color: #ffffff; background: transparent; border-radius: 12px; padding: 12px 25px; transition: all 0.3s; font-weight: 600; }
+    .btn-cancel:hover { background: #dc3545; border-color: #dc3545; color: white; transform: translateY(-2px); }
+
+    .modal-content-dark { background: rgba(15, 15, 15, 0.98) !important; backdrop-filter: blur(20px); border: 1px solid #f1c40f !important; border-radius: 16px; }
+  </style>
+</head>
+
+<body>
+  <div class="fondo"><img src="/images/fondoPersonal.png" alt="Fondo Gimnasio"></div>
+
+  <div class="overlay d-flex align-items-center justify-content-center py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+          <div id="alert-container"></div>
+
+          <div class="card-custom-form">
+            <div class="text-center mb-4 border-bottom pb-3 border-secondary">
+              <div class="d-inline-block p-2 rounded-circle mb-2" style="background: rgba(241, 196, 15, 0.1);">
+                <i class="bi bi-pencil-square fs-2" style="color: #f1c40f;"></i>
+              </div>
+              <h3 class="fw-bold m-0 text-white text-uppercase">Modificar <span style="color: #f1c40f;">Membresía</span></h3>
+              <p class="text-white-50 small m-0 mt-1" id="info-id-membresia">Cargando datos...</p>
+            </div>
+
+            <form id="form-actualizar-membresia">
+              <div class="mb-4">
+                <label for="nombre_plan" class="form-label"><i class="bi bi-tag me-2"></i>Nombre del Plan</label>
+                <input type="text" id="nombre_plan" class="form-control input-custom" required>
+              </div>
+
+              <div class="mb-4">
+                <label for="id_tipo_membresia" class="form-label"><i class="bi bi-clock-history me-2"></i>Frecuencia / Duración</label>
+                <div class="input-group">
+                  <select id="id_tipo_membresia" class="form-select input-custom" required>
+                    <option value="" disabled selected>Cargando categorías...</option>
+                  </select>
+                  <button class="btn btn-outline-warning fw-bold" type="button" data-bs-toggle="modal" data-bs-target="#modalNuevoTipo">
+                    <i class="bi bi-plus-lg"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="precio" class="form-label"><i class="bi bi-cash-stack me-2"></i>Precio (en BOB)</label>
+                <input type="number" step="0.01" id="precio" class="form-control input-custom" required min="0">
+              </div>
+
+              <div class="mb-4">
+                <label for="beneficios" class="form-label"><i class="bi bi-card-text me-2"></i>Beneficios Incluidos</label>
+                <textarea id="beneficios" class="form-control input-custom" rows="4" required></textarea>
+              </div>
+
+              <div class="d-flex gap-3 pt-3 border-top border-secondary">
+                <button type="submit" id="btn-guardar" class="btn btn-update w-100 text-uppercase">Guardar Cambios</button>
+                <a href="/routes/personal/membresia/membresiaList.html" class="btn btn-cancel w-50 text-uppercase text-center text-decoration-none">Cancelar</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalNuevoTipo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content modal-content-dark">
+        <div class="modal-header border-bottom border-warning">
+          <h5 class="modal-title fw-bold text-warning"><i class="bi bi-plus-circle me-2"></i> NUEVA CATEGORÍA</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="form-nuevo-tipo-membresia">
+          <div class="modal-body">
+            <div id="modal-alert-container"></div>
+            <div class="mb-3">
+              <label class="form-label text-warning">Nombre del Período</label>
+              <input type="text" id="nuevo_tipo_nombre" class="form-control input-custom" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-warning">Duración (en días)</label>
+              <input type="number" id="nuevo_tipo_duracion" class="form-control input-custom" required min="1">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+            <button type="submit" id="btn-guardar-tipo" class="btn btn-warning fw-bold text-dark">GUARDAR TIPO</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const membresiaId = urlParams.get('id');
+    const API_MEMBRESIAS_URL = "http://127.0.0.1:8000/api/personal/membresias";
+    const API_TIPOS_MEMBRESIAS_URL = "http://127.0.0.1:8000/api/personal/tiposmembresia";
+    const token = localStorage.getItem('toke_usuario');
+    const rol = localStorage.getItem('usuario_rol');
+
+    const formMembresia = document.getElementById('form-actualizar-membresia');
+    const selectTipo = document.getElementById('id_tipo_membresia');
+    const formTipo = document.getElementById('form-nuevo-tipo-membresia');
+    const btnGuardarTipo = document.getElementById('btn-guardar-tipo');
+    const alertContainer = document.getElementById('alert-container');
+    const modalAlertContainer = document.getElementById('modal-alert-container');
+
+    if (!token || (rol !== 'personal' && rol !== 'Administrador' && rol !== 'Recepcionista')) {
+        window.location.href = "/login.html";
+    }
+
+    function getAuthHeaders() { return { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` }; }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('info-id-membresia').textContent = `Modificando Plan: #${membresiaId}`;
+      await cargarTiposMembresia();
+      await cargarDatosMembresia();
+    });
+
+    async function cargarTiposMembresia(idSeleccionado = null) {
+      const res = await fetch(API_TIPOS_MEMBRESIAS_URL, { headers: getAuthHeaders() });
+      const tipos = await res.json();
+      selectTipo.innerHTML = tipos.map(t => `<option value="${t.id_Tipo_Membresia}">${t.Tipo} (${t.Duracion} días)</option>`).join('');
+      if (idSeleccionado) selectTipo.value = idSeleccionado;
+    }
+
+    async function cargarDatosMembresia() {
+      const res = await fetch(`${API_MEMBRESIAS_URL}/${membresiaId}`, { headers: getAuthHeaders() });
+      const m = await res.json();
+      document.getElementById('nombre_plan').value = m.Nombre_Plan;
+      document.getElementById('precio').value = parseFloat(m.Precio).toFixed(2);
+      document.getElementById('beneficios').value = m.Beneficios;
+      selectTipo.value = m.id_Tipo_Membresia;
+    }
+
+    // Guardar nuevo tipo de membresía
+    formTipo.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        btnGuardarTipo.disabled = true;
+
+        const payloadTipo = {
+            "Tipo": document.getElementById('nuevo_tipo_nombre').value.trim(),
+            "Duracion": parseInt(document.getElementById('nuevo_tipo_duracion').value)
+        };
+
+        try {
+            const response = await fetch(API_TIPOS_MEMBRESIAS_URL, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(payloadTipo)
+            });
+
+            const resData = await response.json().catch(() => ({}));
+
+            if (response.ok || response.status === 201) {
+                formTipo.reset();
+                modalAlertContainer.innerHTML = "";
+                bootstrap.Modal.getInstance(document.getElementById('modalNuevoTipo')).hide();
+
+                const nuevoId = resData.id_Tipo_Membresia || (resData.tipo && resData.tipo.id_Tipo_Membresia) || null;
+                await cargarTiposMembresia(nuevoId);
+                mostrarAlerta("¡Nueva categoría guardada con éxito!", "success");
+            } else {
+                throw new Error(resData.message || "La base de datos rechazó la categoría.");
+            }
+        } catch (error) {
+            modalAlertContainer.innerHTML = `<div class="alert alert-danger fw-bold small py-2 mb-0"> Error: ${error.message}</div>`;
+        } finally {
+            btnGuardarTipo.disabled = false;
+        }
+    });
+
+    formMembresia.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        id_Tipo_Membresia: parseInt(selectTipo.value),
+        Precio: parseFloat(document.getElementById('precio').value),
+        Nombre_Plan: document.getElementById('nombre_plan').value.trim(),
+        Beneficios: document.getElementById('beneficios').value.trim()
+      };
+
+      try {
+        const res = await fetch(`${API_MEMBRESIAS_URL}/${membresiaId}`, {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          mostrarAlerta("¡Actualizado con éxito!", "success");
+          setTimeout(() => { window.location.href = "membresiaList.html"; }, 1500);
+        } else {
+          throw new Error("Error al procesar la actualización.");
+        }
+      } catch (err) {
+        mostrarAlerta(err.message, "danger");
+      }
+    });
+
+    function mostrarAlerta(mensaje, tipo) {
+        alertContainer.innerHTML = `<div class="alert alert-${tipo} alert-dismissible fade show fw-bold text-center" role="alert"><div>${mensaje}</div><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

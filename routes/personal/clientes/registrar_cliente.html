@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BODY XTREME - Registro de Clientes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilos.css">
+
+  <style>
+    /* Estilos base y consistencia del Dark Mode */
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Montserrat', sans-serif;
+      color: #fff;
+      background-color: #000;
+    }
+
+    .fondo {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; overflow: hidden;
+    }
+    .fondo img { width: 100%; height: 100%; object-fit: cover; opacity: 0.35; }
+    .overlay { min-height: 100vh; background: rgba(0, 0, 0, 0.5); position: relative; z-index: 1; }
+
+    .card-custom-form {
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(10px);
+      border: 2px solid #00ff88;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9);
+    }
+
+    .form-label {
+      color: #00ff88;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    .input-custom {
+      background-color: rgba(20, 20, 20, 0.8) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      color: #fff !important;
+    }
+    .input-custom:focus {
+      border-color: #00ff88 !important;
+      box-shadow: 0 0 8px rgba(0, 255, 136, 0.3) !important;
+    }
+
+    /* Campos informativos no editables */
+    .input-readonly {
+      background-color: rgba(40, 40, 40, 0.5) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      color: #00ff88 !important;
+      font-weight: 600;
+    }
+
+    .form-scroll-container {
+      max-height: 550px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    .form-scroll-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .form-scroll-container::-webkit-scrollbar-thumb {
+      background: #00ff88;
+      border-radius: 4px;
+    }
+
+    .btn-neon {
+      background: #00ff88; color: #000; border: none; font-weight: 700; transition: all 0.3s ease;
+    }
+    .btn-neon:hover {
+      background: #00cc6a; box-shadow: 0 0 15px rgba(0, 255, 136, 0.5); color: #000;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="fondo">
+    <img src="/images/fondo.jpg" alt="Fondo Gimnasio">
+  </div>
+
+  <div class="overlay d-flex align-items-center justify-content-center py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+
+          <div id="contenedor-alertas"></div>
+
+          <div class="card-custom-form">
+            <div class="text-center mb-4 border-bottom pb-3 border-secondary">
+              <h3 class="fw-bold m-0 text-white text-uppercase">
+                Registro de <span style="color: #00ff88;">Clientes</span>
+              </h3>
+              <p class="text-white-50 small m-0 mt-1">Ingresa los datos personales y procesa el primer pago de membresía</p>
+            </div>
+
+            <form id="formulario-registro-cliente">
+              <div>
+
+                <h5 class="text-white border-bottom border-secondary pb-2 mb-3"
+                  style="font-size: 1rem; letter-spacing: 0.5px;">1. Información de la Cuenta</h5>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="ci_cliente" class="form-label">CI del Cliente</label>
+                    <input type="number" id="ci_cliente" class="form-control input-custom" placeholder="Ej: 8339442"
+                      required min="1">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input type="text" id="nombre" class="form-control input-custom" placeholder="Nombres" required>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="paterno" class="form-label">Apellido Paterno</label>
+                    <input type="text" id="paterno" class="form-control input-custom" placeholder="Apellido Paterno"
+                      required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="materno" class="form-label">Apellido Materno</label>
+                    <input type="text" id="materno" class="form-control input-custom" placeholder="Apellido Materno"
+                      required>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="telefono" class="form-label">Teléfono / Celular</label>
+                    <input type="text" id="telefono" class="form-control input-custom" placeholder="Ej: 71234567">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="correo" class="form-label">Correo Electrónico</label>
+                    <input type="email" id="correo" class="form-control input-custom" placeholder="cliente@correo.com"
+                      required>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="contrasena" class="form-label">Contraseña de Acceso</label>
+                    <input type="password" id="contrasena" class="form-control input-custom"
+                      placeholder="Mínimo 6 caracteres" required>
+                  </div>
+                </div>
+
+                <h5 class="text-white border-bottom border-secondary pb-2 mt-4 mb-3"
+                  style="font-size: 1rem; letter-spacing: 0.5px;">2. Plan de Membresía e Inicialización de Pago</h5>
+
+                <div class="mb-3">
+                  <label for="id_membresia" class="form-label">Seleccionar Plan</label>
+                  <select id="id_membresia" class="form-select input-custom" required>
+                    <option value="" disabled selected>Cargando planes disponibles de la API...</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="info_beneficios" class="form-label">Beneficios del Plan Seleccionado</label>
+                  <textarea id="info_beneficios" class="form-control input-readonly" rows="2" readonly placeholder="Seleccione un plan para visualizar los beneficios..."></textarea>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="info_duracion" class="form-label">Frecuencia / Duración</label>
+                    <input type="text" id="info_duracion" class="form-control input-readonly" readonly placeholder="Días de cobertura">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="monto" class="form-label">Monto de Pago (BOB)</label>
+                    <input type="number" step="0.01" id="monto" class="form-control input-custom" placeholder="0.00"
+                      required>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                    <input type="date" id="fecha_inicio" class="form-control input-custom" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="fecha_final" class="form-label">Fecha de Finalización (Auto)</label>
+                    <input type="date" id="fecha_final" class="form-control input-readonly" readonly>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="id_metodo_pago" class="form-label">Método de Pago</label>
+                    <select id="id_metodo_pago" class="form-select input-custom" required>
+                      <option value="1">Efectivo</option>
+                      <option value="2">Transferencia QR</option>
+                    </select>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="d-flex gap-3 pt-3 border-top border-secondary mt-3">
+                <button type="submit" id="btn-registrar" class="btn btn-neon w-100 py-2.5 fw-bold text-uppercase">
+                  Registrar Cliente
+                </button>
+                <a href="clientesList.html"
+                  class="btn btn-outline-secondary w-50 py-2.5 fw-bold text-white text-decoration-none text-center">
+                  Cancelar
+                </a>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const urlApiClientes = "http://127.0.0.1:8000/api/personal/clientes";
+    const urlApiMembresias = "http://127.0.0.1:8000/api/personal/membresias";
+
+    const formularioRegistro = document.getElementById('formulario-registro-cliente');
+    const selectorMembresia = document.getElementById('id_membresia');
+    const botonRegistrar = document.getElementById('btn-registrar');
+    const contenedorAlertas = document.getElementById('contenedor-alertas');
+
+    // Campos dinámicos agregados
+    const txtBeneficios = document.getElementById('info_beneficios');
+    const txtDuracion = document.getElementById('info_duracion');
+    const inputFechaInicio = document.getElementById('fecha_inicio');
+    const inputFechaFinal = document.getElementById('fecha_final');
+
+    // Guardará la colección completa de objetos devueltos por la API
+    let catalogoMembresias = {};
+
+    function obtenerCabeceras() {
+      return {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('toke_usuario')}`
+      };
+    }
+
+    // Inicializar el input date con la fecha de hoy
+    const hoy = new Date().toISOString().split('T')[0];
+    inputFechaInicio.value = hoy;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const respuesta = await fetch(urlApiMembresias, {
+          method: 'GET',
+          headers: obtenerCabeceras()
+        }).catch(() => null);
+
+        let listaMembresias = [];
+
+        if (respuesta && respuesta.ok) {
+          listaMembresias = await respuesta.json();
+        } else {
+          // Fallback estructurado idéntico a tu JSON de respuesta esperado
+          listaMembresias = [{
+            "id_Membresia": 1,
+            "Nombre_Plan": "Plan Premier",
+            "id_Tipo_Membresia": 1,
+            "Precio": 111.46,
+            "Beneficios": "Acceso ilimitado a máquinas y zona cardiovascular",
+            "tiposmembresia": {
+              "id_Tipo_Membresia": 1,
+              "Tipo": "Mensual",
+              "Duracion": 30
+            }
+          }];
+        }
+
+        selectorMembresia.innerHTML = '<option value="" disabled selected>-- Elige un plan de entrenamiento --</option>';
+
+        listaMembresias.forEach(membresia => {
+          // Almacenamos el objeto completo usando su ID como clave
+          catalogoMembresias[membresia.id_Membresia] = membresia;
+
+          // Extraemos de forma segura usando la nueva jerarquía de tu JSON
+          const nombrePlan = membresia.Nombre_Plan || (membresia.tiposmembresia ? membresia.tiposmembresia.Tipo : 'Plan');
+
+          selectorMembresia.innerHTML += `
+                    <option value="${membresia.id_Membresia}">
+                        ${nombrePlan} | Precio: ${membresia.Precio} BOB
+                    </option>
+                `;
+        });
+
+      } catch (error) {
+        console.error(error);
+        mostrarAlertaPantalla("Error al cargar los catálogos de membresías.", "danger");
+      }
+    });
+
+    // Cambios reactivos al alternar el plan en el Select
+    selectorMembresia.addEventListener('change', () => {
+      const idSeleccionado = selectorMembresia.value;
+      const plan = catalogoMembresias[idSeleccionado];
+
+      if (plan) {
+        document.getElementById('monto').value = plan.Precio;
+        txtBeneficios.value = plan.Beneficios || 'Sin beneficios detallados.';
+        
+        if (plan.tiposmembresia) {
+          txtDuracion.value = `${plan.tiposmembresia.Tipo} (${plan.tiposmembresia.Duracion} días)`;
+          calcularFechaFinal(plan.tiposmembresia.Duracion);
+        } else {
+          txtDuracion.value = "No especificado";
+          inputFechaFinal.value = "";
+        }
+      }
+    });
+
+    // Escucha cambios manuales en la fecha de inicio para recalcular la fecha de cierre
+    inputFechaInicio.addEventListener('change', () => {
+      const plan = catalogoMembresias[selectorMembresia.value];
+      if (plan && plan.tiposmembresia) {
+        calcularFechaFinal(plan.tiposmembresia.Duracion);
+      }
+    });
+
+    // Procesa el incremento exacto de días sobre el calendario
+    function calcularFechaFinal(dias) {
+      const fechaInicioStr = inputFechaInicio.value;
+      if (!fechaInicioStr || !dias) return;
+
+      const partes = fechaInicioStr.split('-');
+      // Evitamos desfases de zona horaria instanciando año, mes (0-11) y día directamente
+      const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
+      
+      fecha.setDate(fecha.getDate() + parseInt(dias));
+
+      const yyyy = fecha.getFullYear();
+      const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+      const dd = String(fecha.getDate()).padStart(2, '0');
+
+      inputFechaFinal.value = `${yyyy}-${mm}-${dd}`;
+    }
+
+    function validarFormulario(datosEnvio) {
+      const expresionLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+
+      if (datosEnvio.CI_Cliente <= 0) return "La Cédula de Identidad debe ser un entero positivo válido.";
+
+      if (!expresionLetras.test(datosEnvio.Nombre)) return "El Nombre no debe contener números ni símbolos.";
+      if (!expresionLetras.test(datosEnvio.Paterno)) return "El Apellido Paterno no debe contener números.";
+      if (!expresionLetras.test(datosEnvio.Materno)) return "El Apellido Materno no debe contener números.";
+
+      if (datosEnvio.Contraseña.length < 6 || /\s/.test(datosEnvio.Contraseña)) {
+        return "La contraseña debe poseer mínimo 6 caracteres y no contener espacios en blanco.";
+      }
+
+      const planReal = catalogoMembresias[datosEnvio.id_Membresia];
+      if (planReal && parseFloat(datosEnvio.Monto) !== parseFloat(planReal.Precio)) {
+        return `El monto enviado (${datosEnvio.Monto}) debe ser exactamente igual al precio de la membresía (${planReal.Precio} BOB).`;
+      }
+
+      return null;
+    }
+
+    formularioRegistro.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+
+      const passwordValue = document.getElementById('contrasena').value;
+      const fechaHoy = new Date().toISOString().split('T')[0];
+
+      // Construcción del objeto JSON acoplado al backend
+      const datosEnvio = {
+        "CI_Cliente": parseInt(document.getElementById('ci_cliente').value),
+        "Nombre": document.getElementById('nombre').value.trim(),
+        "Paterno": document.getElementById('paterno').value.trim(),
+        "Materno": document.getElementById('materno').value.trim(),
+        "Telefono": document.getElementById('telefono').value.trim() || null,
+        "Correo_Electronico": document.getElementById('correo').value.trim(),
+        "Contraseña": passwordValue,
+        "Contraseña_confirmation": passwordValue, // Se añade la confirmación de contraseña de manera automatizada
+        "id_Membresia": parseInt(selectorMembresia.value),
+        "id_Metodo_Pago": parseInt(document.getElementById('id_metodo_pago').value),
+        "Monto": parseFloat(document.getElementById('monto').value), 
+        "Fecha_Inicio": inputFechaInicio.value,
+        "Fecha_Pago": fechaHoy // Inyectado internamente con la fecha actual del registro
+      };
+
+      const mensajeError = validarFormulario(datosEnvio);
+
+      if (mensajeError) {
+        mostrarAlertaPantalla(`⚠️ ${mensajeError}`, "warning");
+        return;
+      }
+
+      botonRegistrar.disabled = true;
+      botonRegistrar.textContent = "Procesando Inscripción...";
+
+      try {
+        const respuesta = await fetch(urlApiClientes, {
+          method: 'POST',
+          headers: obtenerCabeceras(),
+          body: JSON.stringify(datosEnvio)
+        });
+
+        const jsonRespuesta = await respuesta.json().catch(() => ({}));
+
+        if (respuesta.status === 422) {
+          throw new Error(jsonRespuesta.error || "Datos duplicados o inconsistentes en la validación.");
+        }
+
+        if (!respuesta.ok) {
+          throw new Error(jsonRespuesta.message || "Error interno al guardar en el servidor.");
+        }
+
+        mostrarAlertaPantalla("¡Cliente registrado y primer pago de membresía procesado con éxito!", "success");
+
+        setTimeout(() => {
+          window.location.href = "/routes/personal/clientes/clientesList.html";
+        }, 2000);
+
+      } catch (error) {
+        console.error(error);
+        mostrarAlertaPantalla(`Error al procesar: ${error.message}`, "danger");
+        botonRegistrar.disabled = false;
+        botonRegistrar.textContent = "Registrar Cliente";
+      }
+    });
+
+    function mostrarAlertaPantalla(mensaje, tipoAlerta) {
+      contenedorAlertas.innerHTML = `
+            <div class="alert alert-${tipoAlerta} alert-dismissible fade show fw-bold" role="alert">
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+
+</html>

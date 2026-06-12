@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BODY XTREME - Gestión de Entrenadores (API)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2 family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilos.css">
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #050505;
+      color: #fff;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    /* --- CORRECCIÓN DEL FONDO --- */
+    .fondo {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+    }
+    .fondo img {
+      width: 100%; height: 100%; object-fit: cover; opacity: 0.6; 
+    }
+    .overlay {
+      position: relative; z-index: 1; min-height: 100vh;
+      background: rgba(10, 10, 10, 0.85); 
+      display: flex; flex-direction: column;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      position: fixed; top: 0; left: -300px; width: 300px; height: 100vh;
+      background: linear-gradient(180deg, #050505 0%, #0a1f12 100%);
+      color: #fff; transition: all 0.3s ease-in-out; padding-top: 20px;
+      z-index: 1100; border-right: 2px solid #00ff88;
+      box-shadow: 5px 0 25px rgba(0, 255, 136, 0.1);
+      display: flex; flex-direction: column;
+    }
+    .sidebar.active { left: 0; }
+    #menu-roles-container { flex-grow: 1; overflow-y: auto; margin-top: 15px; }
+    .sidebar a {
+      display: flex; align-items: center; padding: 16px 25px; color: #e0e0e0;
+      text-decoration: none; font-size: 1rem; font-weight: 600;
+      transition: all 0.2s ease; border-left: 4px solid transparent;
+    }
+    .sidebar a:hover { background: rgba(0, 255, 136, 0.1); color: #00ff88; border-left: 4px solid #00ff88; padding-left: 30px; }
+    #closeSidebar { font-size: 24px; color: #fff; cursor: pointer; align-self: flex-end; margin-right: 20px; text-decoration: none; transition: 0.3s; }
+    #closeSidebar:hover { color: #dc3545; transform: scale(1.1); }
+    .sidebar .logout { padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+
+    /* --- HEADER --- */
+    header {
+      background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(10px);
+      padding: 15px 25px; display: flex; justify-content: space-between;
+      align-items: center; border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .hamburger {
+      font-size: 26px; cursor: pointer; color: #000; background: #00ff88;
+      border-radius: 8px; padding: 5px 12px; transition: all 0.3s ease;
+    }
+    .hamburger:hover { background: #00cc6c; transform: translateY(-2px); }
+    .logo-header { font-weight: 900; font-size: 1.5rem; font-style: italic; letter-spacing: 1px; margin: 0; color: #ffffff; }
+    .text-neon { color: #00ff88; text-shadow: 0 0 8px rgba(0, 255, 136, 0.4); }
+    .user-info img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #00ff88; object-fit: cover; }
+
+    /* --- COMPONENTES DEL DASHBOARD --- */
+    .card-custom {
+      background: rgba(15, 15, 15, 0.85);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+      width: 100%;
+    }
+
+    .titulo-moderno {
+      font-size: 1.8rem; font-weight: 900; letter-spacing: -1px;
+      text-transform: uppercase; color: #ffffff;
+    }
+    @media (min-width: 768px) {
+      .titulo-moderno { font-size: 2.2rem; }
+      .card-custom { padding: 30px; }
+    }
+
+    /* Buscador */
+    .search-container { position: relative; width: 100%; }
+    .search-icon { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: #00ff88; font-size: 1.2rem; }
+    .search-input-custom {
+      background: rgba(0, 0, 0, 0.6) !important;
+      border: 1px solid #444 !important;
+      color: #fff !important;
+      padding: 12px 15px 12px 45px !important;
+      border-radius: 12px !important;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    .search-input-custom:focus { border-color: #00ff88 !important; box-shadow: 0 0 15px rgba(0, 255, 136, 0.3) !important; outline: none; }
+    .search-input-custom::placeholder { color: rgba(255, 255, 255, 0.4); }
+
+    /* Botones */
+    .btn-neon {
+      background: transparent; color: #00ff88; border: 2px solid #00ff88; border-radius: 10px; font-weight: 800; transition: all 0.3s ease;
+      display: inline-block; text-align: center;
+    }
+    .btn-neon:hover { background: #00ff88; color: #000; box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); transform: translateY(-2px); }
+
+    .btn-action-table {
+      background: transparent; border: 1px solid #00ff88; color: #00ff88; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: bold; transition: 0.3s; white-space: nowrap;
+    }
+    .btn-action-table:hover { background: #00ff88; color: #000; box-shadow: 0 0 10px rgba(0,255,136,0.4); }
+
+    /* Tabla */
+    .table-responsive-custom { border-radius: 12px; border: 1px solid rgba(0, 255, 136, 0.2); }
+    .table-custom { margin: 0; background: rgba(0,0,0,0.4); }
+    .table-custom thead th { background-color: #0a0a0a !important; color: #00ff88 !important; border-bottom: 2px solid #00ff88 !important; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; padding: 15px; }
+    .table-custom tbody tr { transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .table-custom tbody tr:hover { background-color: rgba(0, 255, 136, 0.05) !important; }
+    .table-custom tbody td { padding: 15px; vertical-align: middle; color: #f0f0f0; border: none; }
+    .td-id { font-weight: 900; color: #00ff88 !important; letter-spacing: 1px; }
+
+    /* Paginación */
+    .pagination-custom .page-link { background: #111; color: #e0e0e0; border: 1px solid rgba(0, 255, 136, 0.2); margin: 0 3px; border-radius: 6px; transition: 0.3s; }
+    .pagination-custom .page-item.active .page-link { background: #00ff88; color: #000; border-color: #00ff88; font-weight: bold; box-shadow: 0 0 10px rgba(0,255,136,0.3); }
+    .pagination-custom .page-link:hover:not(.active) { background: rgba(0, 255, 136, 0.1); color: #00ff88; }
+    .pagination-custom .page-item.disabled .page-link { opacity: 0.5; cursor: not-allowed; }
+
+    /* Ficha de Detalles en Modal */
+    .modal-content-dark { background: rgba(15, 15, 15, 0.95) !important; backdrop-filter: blur(20px); border: 1px solid #00ff88 !important; border-radius: 16px; box-shadow: 0 0 40px rgba(0,0,0,0.9); }
+    .modal-header-custom { border-bottom: 1px solid rgba(0, 255, 136, 0.2); padding: 20px 25px; }
+    .modal-footer-custom { border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 20px 25px; }
+    .texto-justificado { text-align: justify; text-justify: inter-word; }
+
+    .badge-clase {
+      background: #161616 !important;
+      border: 1px solid rgba(0, 243, 255, 0.2);
+      border-left: 4px solid #00f3ff;
+      color: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="fondo">
+    <img src="/images/fondo.jpg" alt="Fondo Gimnasio">
+  </div>
+
+  <div class="overlay">
+    
+    <header>
+      <div class="d-flex align-items-center gap-3">
+        <div class="hamburger" id="hamburger"><i class="bi bi-list"></i></div>
+        <h2 class="logo-header d-none d-sm-block">BODY <span class="text-neon">XTREME</span></h2>
+      </div>
+      <div class="user-info d-flex align-items-center gap-3">
+        <span class="fw-bold text-uppercase small text-white-50" id="display-usuario">Cargando...</span>
+        <img src="/images/usuario.png" alt="Usuario">
+      </div>
+    </header>
+
+    <div class="sidebar" id="sidebar">
+      <a href="#" id="closeSidebar"><i class="bi bi-x-lg"></i></a>
+      <div class="px-4 text-center border-bottom pb-3 mb-2 border-secondary">
+        <h4 class="fw-bold m-0" style="color: #00ff88; font-style: italic;">STAFF PANEL</h4>
+      </div>
+      <div id="menu-roles-container"></div>
+      <div class="logout">
+        <button id="btn-logout" class="btn btn-outline-danger w-100 fw-bold"><i class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión</button>
+      </div>
+    </div>
+
+    <div class="container-fluid px-3 px-md-4 px-xl-5 mt-4 mb-5 flex-grow-1">
+      <div class="titulo-principal mb-3 text-center fw-bold text-uppercase d-none" style="letter-spacing: 2px;">BODY-XTREME</div>
+
+      <div id="alert-container"></div>
+
+      <div class="card-custom">
+        
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center border-bottom border-secondary pb-3 mb-4 gap-3">
+          <h2 class="titulo-moderno m-0 text-center text-md-start w-100"><i class="bi bi-person-vcard text-neon me-2"></i>Control de <span class="text-neon">Entrenadores</span></h2>
+          <a href="registrar_entrenador.html" class="btn btn-neon py-2 px-4 shadow-sm text-uppercase w-100 w-md-auto text-nowrap"><i class="bi bi-person-plus-fill me-2"></i>Registrar Entrenador</a>
+        </div>
+        
+        <div class="row mb-4">
+          <div class="col-12 col-md-8 col-lg-6">
+            <div class="search-container">
+              <i class="bi bi-search search-icon"></i>
+              <input type="text" id="input-busqueda" class="search-input-custom" placeholder="Buscar por ID, Nombre o Especialidad...">
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive table-responsive-custom">
+          <table class="table table-custom text-center align-middle text-nowrap mb-0">
+            <thead>
+              <tr>
+                <th style="width: 8%;">ID</th>
+                <th class="text-start ps-4">Nombre Completo</th>
+                <th>Especialidad</th>
+                <th>Teléfono</th>
+                <th>Correo Electrónico</th>
+                <th style="width: 18%;">Gestión Staff</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-entrenadores">
+              <tr>
+                <td colspan="6" class="text-center text-white-50 py-5">
+                  <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+                  <p class="mb-0 fw-bold text-uppercase tracking-wider">Estableciendo conexión de seguridad con la API...</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
+          <div id="info-paginacion" class="small text-white-50 fw-bold text-center text-md-start">Mostrando 0 de 0 registros</div>
+          <nav aria-label="Navegacion" class="d-flex justify-content-center">
+            <ul class="pagination pagination-custom m-0 flex-wrap justify-content-center" id="ul-paginacion"></ul>
+          </nav>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalDetalles" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content modal-content-dark">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title fw-bold text-uppercase" style="color: #00ff88; letter-spacing: 1px;">
+            <i class="bi bi-person-vcard me-2"></i> Ficha de Contratación Staff
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-4" id="modal-body-content"></div>
+        <div class="modal-footer modal-footer-custom d-flex flex-column flex-md-row justify-content-between gap-3">
+          <div id="modal-footer-actions" class="d-flex gap-2 flex-wrap w-100 w-md-auto justify-content-center justify-content-md-start"></div>
+          <button type="button" class="btn btn-outline-secondary fw-bold px-4 w-100 w-md-auto" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    const API_URL = "http://127.0.0.1:8000/api/personal/entrenadores";
+    const API_CALENDARIO_URL = "http://127.0.0.1:8000/api/calendariogimnasio";
+
+    let cacheEntrenadores = [];
+    let cacheCalendario = [];
+    let entrenadoresFiltrados = [];
+    let paginaActual = 1;
+    const registrosPorPagina = 10;
+
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const closeSidebar = document.getElementById('closeSidebar');
+    const tbody = document.getElementById('tbody-entrenadores');
+    const alertContainer = document.getElementById('alert-container');
+
+    const token = localStorage.getItem('toke_usuario');
+    const rol = localStorage.getItem('usuario_rol');
+
+    if (!token || (rol !== 'personal' && rol !== 'Administrador' && rol !== 'Recepcionista')) {
+      window.location.href = "/login.html";
+    }
+
+    hamburger.addEventListener('click', () => sidebar.classList.add('active'));
+    closeSidebar.addEventListener('click', (e) => { e.preventDefault(); sidebar.classList.remove('active'); });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('display-usuario').textContent = `Rol: ${rol}`;
+      consultarServiciosIniciales();
+      document.getElementById('input-busqueda').addEventListener('input', ejecutarFiltroBuscador);
+    });
+
+    async function consultarServiciosIniciales() {
+      try {
+        const headers = {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        };
+
+        const [resEntrenadores, resCalendario] = await Promise.all([
+          fetch(API_URL, { method: 'GET', headers }),
+          fetch(API_CALENDARIO_URL, { method: 'GET', headers })
+        ]);
+
+        if (resEntrenadores.status === 401 || resEntrenadores.status === 403) {
+          mostrarAlerta("Error 403: No cuentas con privilegios administrativos.", "danger");
+          tbody.innerHTML = `<tr><td colspan="6" class="text-danger fw-bold py-3">Acceso Denegado por el Servidor.</td></tr>`;
+          return;
+        }
+
+        if (!resEntrenadores.ok || !resCalendario.ok) throw new Error("Fallo al obtener recursos.");
+
+        cacheEntrenadores = await resEntrenadores.json();
+        cacheCalendario = await resCalendario.json();
+
+        entrenadoresFiltrados = [...cacheEntrenadores];
+        
+        // Inyectar menú lateral dinámico
+        document.getElementById('menu-roles-container').innerHTML = `
+            <a href="/routes/personal/indexPersonal.html"><i class="bi bi-house-door me-2"></i> Inicio</a>
+            <a href="/routes/personal/clientes/clientesList.html"><i class="bi bi-people me-2"></i> Clientes</a>
+            <a href="/routes/personal/entrenadores/entrenadoresList.html" style="color: #00ff88; border-left: 4px solid #00ff88; background: rgba(0,255,136,0.1);"><i class="bi bi-person-vcard me-2"></i> Entrenadores</a>
+            <a href="/routes/personal/membresia/membresiaList.html"><i class="bi bi-card-checklist me-2"></i> Membresías</a>
+            <a href="/routes/personal/maquinas/maquinasList.html"><i class="bi bi-tools me-2"></i> Maquinaria</a>
+            <a href="/routes/personal/horarios/horarioclaseList.html"><i class="bi bi-calendar-week me-2"></i> Horarios/Clases</a>
+            <a href="/routes/personal/verPerfilPersonal.html" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);"><i class="bi bi-person-badge me-2"></i> Mi Perfil</a>
+        `;
+
+        actualizarInterfazTabla();
+
+      } catch (error) {
+        console.error(error);
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger fw-bold py-5"><i class="bi bi-cloud-slash fs-1 d-block mb-2"></i>ERROR DE CONEXIÓN CON EL BACKEND</td></tr>`;
+        mostrarAlerta("Error al conectar con los servicios API.", "danger");
+      }
+    }
+
+    function ejecutarFiltroBuscador(e) {
+      const query = e.target.value.trim().toLowerCase();
+
+      if (!query) {
+        entrenadoresFiltrados = [...cacheEntrenadores];
+      } else {
+        const esNumerico = /^\d+$/.test(query);
+
+        entrenadoresFiltrados = cacheEntrenadores.filter(entrenador => {
+          if (esNumerico) {
+            return String(entrenador.id_Entrenador).toLowerCase().includes(query);
+          } else {
+            const name = entrenador.usuario && entrenador.usuario.Nombre ? entrenador.usuario.Nombre.toLowerCase() : '';
+            const pat = entrenador.usuario && entrenador.usuario.Paterno ? entrenador.usuario.Paterno.toLowerCase() : '';
+            const mat = entrenador.usuario && entrenador.usuario.Materno ? entrenador.usuario.Materno.toLowerCase() : '';
+            const esp = entrenador.especialidad && entrenador.especialidad.nombre_Especialidad ? entrenador.especialidad.nombre_Especialidad.toLowerCase() : '';
+            return name.includes(query) || pat.includes(query) || mat.includes(query) || esp.includes(query);
+          }
+        });
+      }
+
+      paginaActual = 1;
+      actualizarInterfazTabla();
+    }
+
+    function actualizarInterfazTabla() {
+      tbody.innerHTML = '';
+      const totalRegistros = entrenadoresFiltrados.length;
+
+      if (totalRegistros === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-white-50 py-5"><i class="bi bi-search d-block fs-3 mb-2"></i>No existen registros que coincidan con la búsqueda.</td></tr>`;
+        document.getElementById('info-paginacion').textContent = `Mostrando 0 de 0 registros`;
+        document.getElementById('ul-paginacion').innerHTML = '';
+        return;
+      }
+
+      const indiceInicial = (paginaActual - 1) * registrosPorPagina;
+      const indiceFinal = Math.min(indiceInicial + registrosPorPagina, totalRegistros);
+      const registrosPagina = entrenadoresFiltrados.slice(indiceInicial, indiceFinal);
+
+      registrosPagina.forEach((entrenador) => {
+        const usr = entrenador.usuario || {};
+        const esp = entrenador.especialidad || {};
+        const nombreCompleto = `${usr.Nombre || ''} ${usr.Paterno || ''} ${usr.Materno || ''}`.trim() || 'No especificado';
+        const indexOriginal = cacheEntrenadores.findIndex(e => e.id_Entrenador === entrenador.id_Entrenador);
+
+        tbody.innerHTML += `
+          <tr>
+            <td class="td-id">#${entrenador.id_Entrenador}</td>
+            <td class="text-start ps-4 fw-bold">${nombreCompleto}</td>
+            <td>
+              <span class="badge bg-success px-3 py-2 text-uppercase" style="letter-spacing: 0.5px;">
+                ${esp.nombre_Especialidad || 'Sin especialidad'}
+              </span>
+            </td>
+            <td><i class="bi bi-telephone text-white-50 me-1"></i> ${usr.Telefono || '---'}</td>
+            <td class="text-lowercase small text-white-50">${usr.Correo_Electronico || '---'}</td>
+            <td>
+              <button class="btn-action-table text-uppercase" onclick="verDetalles(${indexOriginal})">
+                <i class="bi bi-eye-fill me-1"></i> Ver Ficha
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('info-paginacion').textContent = `Mostrando registros del ${indiceInicial + 1} al ${indiceFinal} de un total de ${totalRegistros}`;
+      construirPaginadorControladores(totalRegistros);
+    }
+
+    function construirPaginadorControladores(totalRegistros) {
+      const ulPaginacion = document.getElementById('ul-paginacion');
+      ulPaginacion.innerHTML = '';
+
+      const numeroPaginas = Math.ceil(totalRegistros / registrosPorPagina);
+      if (numeroPaginas <= 1) return;
+
+      const esPrimeraPagina = paginaActual === 1;
+      ulPaginacion.innerHTML += `
+        <li class="page-item ${esPrimeraPagina ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="cambiarPagina(${paginaActual - 1}); return false;"><i class="bi bi-chevron-left"></i></a>
+        </li>
+      `;
+
+      for (let i = 1; i <= numeroPaginas; i++) {
+        ulPaginacion.innerHTML += `
+          <li class="page-item ${paginaActual === i ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="cambiarPagina(${i}); return false;">${i}</a>
+          </li>
+        `;
+      }
+
+      const esUltimaPagina = paginaActual === numeroPaginas;
+      ulPaginacion.innerHTML += `
+        <li class="page-item ${esUltimaPagina ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="cambiarPagina(${paginaActual + 1}); return false;"><i class="bi bi-chevron-right"></i></a>
+        </li>
+      `;
+    }
+
+    window.cambiarPagina = function(numero) {
+      paginaActual = numero;
+      actualizarInterfazTabla();
+    };
+
+    window.verDetalles = function (indexInCache) {
+      const item = cacheEntrenadores[indexInCache];
+      if (!item) return;
+
+      const usr = item.usuario || {};
+      const ctr = item.contrato || {};
+      const esp = item.especialidad || {};
+
+      const horariosEspecificos = cacheCalendario.filter(c => c.id_Entrenador === item.id_Entrenador);
+
+      document.getElementById('modal-body-content').innerHTML = `
+        <div class="row g-4">
+            <div class="col-md-6 border-end border-secondary border-opacity-50 pe-md-4">
+                <h6 class="text-white fw-bold text-uppercase mb-3 border-bottom border-secondary pb-2" style="font-size: 0.85rem;"><i class="bi bi-person-fill text-neon me-2"></i>Información Personal</h6>
+                <div class="mb-3">
+                  <p class="text-white-50 small mb-1">ID Staff</p>
+                  <p class="fs-5 fw-bold m-0 text-neon">#${item.id_Entrenador}</p>
+                </div>
+                <div class="mb-3">
+                  <p class="text-white-50 small mb-1">Nombre Completo</p>
+                  <p class="fw-bold m-0">${usr.Nombre || '---'} ${usr.Paterno || ''} ${usr.Materno || ''}</p>
+                </div>
+                <div class="mb-3">
+                  <p class="text-white-50 small mb-1">Contacto / Correo</p>
+                  <p class="m-0 small"><i class="bi bi-telephone text-white-50 me-1"></i> ${usr.Telefono || '---'}</p>
+                  <p class="m-0 small text-lowercase text-white-50 mt-1"><i class="bi bi-envelope text-white-50 me-1"></i> ${usr.Correo_Electronico || '---'}</p>
+                </div>
+                <div>
+                  <p class="text-white-50 small mb-1">Área Técnica</p>
+                  <span class="badge bg-success text-uppercase fw-bold px-3 py-1.5" style="letter-spacing:0.5px;">
+                    ${esp.nombre_Especialidad || 'Sin Especialidad'}
+                  </span>
+                </div>
+            </div>
+            
+            <div class="col-md-6 ps-md-3">
+                <h6 class="text-white fw-bold text-uppercase mb-3 border-bottom border-secondary pb-2" style="font-size: 0.85rem;"><i class="bi bi-file-earmark-text-fill text-warning me-2"></i>Condiciones de Contrato</h6>
+                <div class="p-3 rounded mb-3" style="background: rgba(255, 193, 7, 0.05); border: 1px solid rgba(255, 193, 7, 0.2);">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="text-warning fw-bold text-uppercase small">Sueldo Base</span>
+                    <span class="fw-bold text-white font-monospace">${ctr.Sueldo ? parseFloat(ctr.Sueldo).toLocaleString() : '0'} BOB</span>
+                  </div>
+                  <p class="text-white-50 small m-0 mt-2"><i class="bi bi-calendar-check me-1"></i> Alta: ${ctr.Fecha_Contratacion ? ctr.Fecha_Contratacion.split(" ")[0] : '---'}</p>
+                  <p class="text-white-50 small m-0"><i class="bi bi-calendar-x me-1"></i> Fin: ${ctr.Fecha_Vigencia ? ctr.Fecha_Vigencia.split(" ")[0] : '---'}</p>
+                </div>
+                <div>
+                    <strong style="font-size: 0.80rem;" class="text-uppercase text-white-50">Cláusulas / Detalles:</strong>
+                    <p class="mt-1 p-2 rounded small text-white-50 texto-justificado" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); max-height: 80px; overflow-y: auto;">
+                        ${ctr.Detalles || 'Sin observaciones particulares registradas.'}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-12">
+                <h6 class="text-white fw-bold text-uppercase mb-3 border-bottom border-secondary pb-2" style="font-size: 0.85rem;"><i class="bi bi-calendar-week-fill text-info me-2"></i>Planificación de Horarios Asignados</h6>
+                <div id="md-clases-container" class="row g-2" style="max-height: 160px; overflow-y:auto; padding-right: 5px;"></div>
+            </div>
+        </div>
+      `;
+
+      const containerClases = document.getElementById('md-clases-container');
+      if (horariosEspecificos.length === 0) {
+        containerClases.innerHTML = `
+          <div class="col-12">
+            <div class="bg-dark p-3 rounded text-center border border-secondary border-opacity-50" style="background-color: #111 !important;">
+                <i class="bi bi-calendar-x fs-4 text-white-50 d-block mb-1"></i>
+                <span class="text-white-50 small text-uppercase">Este entrenador no posee sesiones asignadas en la grilla horaria.</span>
+            </div>
+          </div>`;
+      } else {
+        horariosEspecificos.forEach(h => {
+          const diaNombre = h.dia ? h.dia.Dia : 'Desconocido';
+          const horaFmt = h.hora ? h.hora.Hora : '--:--';
+          const claseNombre = h.clase ? h.clase.Nombre : 'Clase No Registrada';
+          const cupos = h.clase ? h.clase.Cupo_Maximo : '0';
+
+          containerClases.innerHTML += `
+            <div class="col-sm-6">
+              <div class="badge-clase d-flex flex-column h-100 justify-content-center">
+                <span class="text-white fw-bold d-block" style="font-size: 14px;"><i class="bi bi-lightning-charge-fill text-info me-1"></i>${claseNombre}</span>
+                <span class="text-warning small mt-1 fw-semibold">📅 ${diaNombre} a las ⏰ ${horaFmt}</span>
+                <span class="text-white-50 mt-0.5" style="font-size: 11px;">Cupo Máx: ${cupos} alumnos</span>
+              </div>
+            </div>`;
+        });
+      }
+
+      document.getElementById('modal-footer-actions').innerHTML = `
+          <a href="actualizar_entrenador.html?id=${item.id_Entrenador}" class="btn btn-outline-warning fw-bold text-uppercase px-3 py-2 w-100 w-md-auto mb-2 mb-md-0" style="font-size:12px; border-radius: 8px;">
+            <i class="bi bi-pencil-square me-1"></i> Actualizar Info
+          </a>
+          <button class="btn btn-danger fw-bold text-uppercase px-3 py-2 w-100 w-md-auto" style="font-size:12px; border-radius: 8px;" onclick="eliminarEntrenador(${item.id_Entrenador})">
+            <i class="bi bi-person-x-fill me-1"></i> Dar de Baja
+          </button>
+      `;
+
+      const miModal = new bootstrap.Modal(document.getElementById('modalDetalles'));
+      miModal.show();
+    };
+
+    window.eliminarEntrenador = async function (id) {
+      if (!confirm(`¿Confirmas la eliminación definitiva del entrenador con ID #${id}?`)) return;
+
+      const modalInstancia = bootstrap.Modal.getInstance(document.getElementById('modalDetalles'));
+      if(modalInstancia) modalInstancia.hide();
+
+      try {
+        const res = await fetch(`${API_URL}/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (res.ok) {
+          mostrarAlerta("✔️ Entrenador eliminado correctamente de la planilla.", "success");
+          consultarServiciosIniciales();
+        } else {
+          mostrarAlerta("No se pudo ejecutar la remoción en el backend.", "danger");
+        }
+      } catch (error) {
+        mostrarAlerta("Error de conexión al procesar la baja.", "danger");
+      }
+    };
+
+    function mostrarAlerta(msg, tipo) {
+      alertContainer.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show fw-bold text-center border-0 shadow-lg" role="alert">
+            ${msg}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      `;
+    }
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = "/index.html";
+    });
+  </script>
+</body>
+
+</html>

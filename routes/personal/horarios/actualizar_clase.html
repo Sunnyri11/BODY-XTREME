@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BODY XTREME - Editar Clase</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilos.css">
+
+  <style>
+    body, html {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Montserrat', sans-serif;
+      color: #fff;
+      background-color: #000;
+    }
+    .fondo {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;
+    }
+    .fondo img { width: 100%; height: 100%; object-fit: cover; opacity: 0.25; }
+    .overlay { min-height: 100vh; background: rgba(0, 0, 0, 0.6); }
+
+    /* Estilo del Formulario Dark Mode de Actualización */
+    .card-custom-form {
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(10px);
+      border: 2px solid #f1c40f; /* Ámbar representativo de edición */
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9);
+    }
+    .form-label {
+      color: #f1c40f;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+    .input-custom {
+      background-color: rgba(20, 20, 20, 0.8) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      color: #fff !important;
+    }
+    .input-custom:focus {
+      border-color: #f1c40f !important;
+      box-shadow: 0 0 8px rgba(241, 196, 15, 0.3) !important;
+    }
+    .btn-update {
+      background: #f1c40f; color: #000; border: none; font-weight: 700; transition: all 0.3s ease;
+    }
+    .btn-update:hover {
+      background: #d4ac0d; box-shadow: 0 0 15px rgba(241, 196, 15, 0.5); color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="fondo">
+    <img src="/images/fondoPersonal.png" alt="Fondo Gimnasio">
+  </div>
+
+  <div class="overlay d-flex align-items-center justify-content-center py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+          <div id="alert-container"></div>
+
+          <div class="card-custom-form">
+            <div class="text-center mb-4 border-bottom pb-3 border-secondary border-opacity-50">
+              <h3 class="fw-bold m-0 text-white text-uppercase">
+                Modificar <span style="color: #f1c40f;">Clase</span>
+              </h3>
+              <p class="text-white-50 small m-0 mt-1" id="info-id-clase">Sincronizando ID de la disciplina...</p>
+            </div>
+
+            <form id="form-actualizar-clase">
+
+              <div class="mb-4">
+                <label for="nombre" class="form-label text-uppercase">Nombre de la Clase</label>
+                <input type="text" id="nombre" class="form-control input-custom" placeholder="Cargando..." required maxlength="100">
+              </div>
+
+              <div class="mb-4">
+                <label for="cupo_maximo" class="form-label text-uppercase">Cupo Máximo de Alumnos</label>
+                <input type="number" id="cupo_maximo" class="form-control input-custom" placeholder="Cargando..." required min="1" step="1">
+              </div>
+
+              <div class="mb-5">
+                <label for="descripcion" class="form-label text-uppercase">Descripción de la Disciplina</label>
+                <textarea id="descripcion" class="form-control input-custom" rows="4" placeholder="Cargando descripción..." required></textarea>
+              </div>
+
+              <div class="d-flex justify-content-between gap-3 border-top border-secondary border-opacity-50 pt-3">
+                <button type="submit" id="btn-guardar" class="btn btn-update px-4 py-2 text-uppercase w-100">
+                  Guardar Cambios
+                </button>
+                <a href="/routes/personal/horarios/horarioclaseList.html" class="btn btn-outline-danger px-4 py-2 fw-bold text-white text-decoration-none text-center w-50">
+                  Cancelar
+                </a>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Obtener ID de la clase desde la URL (?id=X)
+    const urlParams = new URLSearchParams(window.location.search);
+    const claseId = urlParams.get('id');
+
+    const API_CLASES_URL = "http://127.0.0.1:8000/api/personal/clases";
+
+    const token = localStorage.getItem('toke_usuario');
+    const rol = localStorage.getItem('usuario_rol');
+
+    const formClase = document.getElementById('form-actualizar-clase');
+    const btnGuardar = document.getElementById('btn-guardar');
+    const alertContainer = document.getElementById('alert-container');
+
+    // Validación preventiva de sesión y rol
+    if (!token || (rol !== 'personal' && rol !== 'Administrador')) {
+        window.location.href = "login.html";
+    }
+
+    if (!claseId) {
+        alert("Falta el identificador único de la clase para habilitar la edición.");
+        window.location.href = "clases_horarios.html";
+    }
+
+    function getAuthHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+    }
+
+    // Inicialización al cargar la vista
+    document.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById('info-id-clase').textContent = `Modificando Registro de Clase: #${claseId}`;
+        await cargarDatosClase();
+    });
+
+    // GET: Cargar los datos actuales de la clase seleccionada
+    async function cargarDatosClase() {
+        try {
+            const response = await fetch(`${API_CLASES_URL}/${claseId}`, {
+                method: 'GET',
+                headers: getAuthHeaders()
+            });
+
+            if (!response.ok) throw new Error("No se pudo localizar la clase seleccionada en la base de datos.");
+            
+            const clase = await response.json();
+
+            // Población de los campos del formulario con los valores actuales
+            document.getElementById('nombre').value = clase.Nombre || '';
+            document.getElementById('cupo_maximo').value = clase.Cupo_Maximo || '';
+            document.getElementById('descripcion').value = clase.Descripción || '';
+
+        } catch (error) {
+            console.error(error);
+            mostrarAlerta(`Error al inicializar datos: ${error.message}`, "danger");
+            btnGuardar.disabled = true;
+        }
+    }
+
+    // PUT: Envío de las modificaciones de la clase armada
+    formClase.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        btnGuardar.disabled = true;
+        btnGuardar.textContent = "Sincronizando Cambios...";
+
+        const payloadClase = {
+            "Nombre": document.getElementById('nombre').value.trim(),
+            "Descripción": document.getElementById('descripcion').value.trim(),
+            "Cupo_Maximo": parseInt(document.getElementById('cupo_maximo').value)
+        };
+
+        try {
+            const response = await fetch(`${API_CLASES_URL}/${claseId}`, {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(payloadClase)
+            });
+
+            const jsonResponse = await response.json().catch(() => ({}));
+
+            if (response.ok) {
+                mostrarAlerta("¡Clase actualizada con éxito en el sistema central!", "success");
+                
+                setTimeout(() => {
+                    window.location.href = "/routes/personal/horarios/horarioclaseList.html";
+                }, 1800);
+            } else {
+                let msgError = jsonResponse.message || "Error al procesar la actualización de la clase.";
+                if (jsonResponse.errors) {
+                    msgError = Object.values(jsonResponse.errors).flat().join("<br>");
+                }
+                throw new Error(msgError);
+            }
+        } catch (error) {
+            console.error(error);
+            mostrarAlerta(`Error en la transacción: ${error.message}`, "danger");
+            
+            btnGuardar.disabled = false;
+            btnGuardar.textContent = "Guardar Cambios";
+        }
+    });
+
+    function mostrarAlerta(mensaje, tipo) {
+        alertContainer.innerHTML = `
+            <div class="alert alert-${tipo} alert-dismissible fade show fw-bold text-center" role="alert">
+                <div>${mensaje}</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

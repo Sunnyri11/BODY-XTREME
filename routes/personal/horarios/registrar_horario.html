@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BODY XTREME - Asignar Horario</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilos.css">
+
+  <style>
+    body, html {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Montserrat', sans-serif;
+      color: #fff;
+      background-color: #000;
+    }
+    .fondo {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;
+    }
+    .fondo img { width: 100%; height: 100%; object-fit: cover; opacity: 0.25; }
+    .overlay { min-height: 100vh; background: rgba(0, 0, 0, 0.6); }
+
+    /* Estilo del Formulario Dark Mode */
+    .card-custom-form {
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(10px);
+      border: 2px solid #00ff88; 
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9);
+    }
+    .form-label {
+      color: #00ff88;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+    .input-custom {
+      background-color: rgba(20, 20, 20, 0.8) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      color: #fff !important;
+    }
+    .input-custom:focus {
+      border-color: #00ff88 !important;
+      box-shadow: 0 0 8px rgba(0, 255, 136, 0.3) !important;
+    }
+    .btn-save {
+      background: #00ff88; color: #000; border: none; font-weight: 700; transition: all 0.3s ease;
+    }
+    .btn-save:hover {
+      background: #00cc6a; box-shadow: 0 0 15px rgba(0, 255, 136, 0.5); color: #000;
+    }
+    
+    /* Estilos para los Modales */
+    .modal-content-custom {
+      background: rgba(15, 15, 15, 0.95);
+      backdrop-filter: blur(15px);
+      border: 2px solid #00ff88;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="fondo">
+    <img src="/images/fondoPersonal.png" alt="Fondo Gimnasio">
+  </div>
+
+  <div class="overlay d-flex align-items-center justify-content-center py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+          <div id="alert-container"></div>
+
+          <div class="card-custom-form">
+            <div class="text-center mb-4 border-bottom pb-3 border-secondary border-opacity-50">
+              <h3 class="fw-bold m-0 text-white text-uppercase">
+                Asignar <span style="color: #00ff88;">Horario</span>
+              </h3>
+              <p class="text-white-50 small m-0 mt-1">Vincula clases, entrenadores, días y horas del sistema</p>
+            </div>
+
+            <form id="form-registrar-horario">
+
+            <div class="mb-4">
+              <label for="id_clase" class="form-label text-uppercase">Clase / Disciplina</label>
+              <select id="id_clase" class="form-select input-custom" required>
+                <option value="" disabled selected>-- Elige una Clase --</option>
+              </select>
+            </div>
+            
+            <div class="mb-4">
+              <label for="id_entrenador" class="form-label text-uppercase">Instructor / Entrenador</label>
+              <select id="id_entrenador" class="form-select input-custom" required>
+                <option value="" disabled selected>-- Elige un Entrenador --</option>
+              </select>
+            </div>
+
+
+              <div class="row">
+                <div class="col-md-6 mb-4">
+                  <label for="id_dia" class="form-label text-uppercase">Día de la Semana</label>
+                  <div class="input-group">
+                    <select id="id_dia" class="form-select input-custom" required>
+                      <option value="" disabled selected>Cargando días...</option>
+                    </select>
+                    <button type="button" class="btn btn-outline-success fw-bold" data-bs-toggle="modal" data-bs-target="#modalDia">＋</button>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                  <label for="id_hora" class="form-label text-uppercase">Bloque de Hora (ID)</label>
+                  <div class="input-group">
+                    <select id="id_hora" class="form-select input-custom" required>
+                      <option value="" disabled selected>Cargando horas...</option>
+                    </select>
+                    <button type="button" class="btn btn-outline-success fw-bold" data-bs-toggle="modal" data-bs-target="#modalHora">＋</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-5">
+                <label for="id_estado" class="form-label text-uppercase">Estado inicial</label>
+                <select id="id_estado" class="form-select input-custom" required>
+                  <option value="" disabled selected>-- Selecciona Estado --</option>
+                  <option value="1" selected>Activo (ID: 1)</option>
+                  <option value="2">Inactivo (ID: 2)</option>
+                </select>
+              </div>
+
+              <div class="d-flex justify-content-between gap-3 border-top border-secondary border-opacity-50 pt-3">
+                <button type="submit" id="btn-guardar" class="btn btn-save px-4 py-2 text-uppercase w-100">
+                  Agendar Bloque
+                </button>
+                <a href="/routes/personal/horarios/horarioclaseList.html" class="btn btn-outline-danger px-4 py-2 fw-bold text-white text-decoration-none text-center w-50">
+                  Cancelar
+                </a>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalDia" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content modal-content-custom">
+        <div class="modal-header border-secondary border-opacity-50">
+          <h5 class="modal-title fw-bold text-uppercase">Nuevo Día</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="form-modal-dia">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="input-nuevo-dia" class="form-label text-uppercase">Nombre del Día</label>
+              <input type="text" id="input-nuevo-dia" class="form-control input-custom" placeholder="Ej: Domingo" required>
+            </div>
+          </div>
+          <div class="modal-footer border-secondary border-opacity-50">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-save px-3">Guardar Día</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalHora" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content modal-content-custom">
+        <div class="modal-header border-secondary border-opacity-50">
+          <h5 class="modal-title fw-bold text-uppercase">Nuevo Bloque de Hora</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="form-modal-hora">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="input-nueva-hora" class="form-label text-uppercase">Hora del Bloque</label>
+              <input type="text" id="input-nueva-hora" class="form-control input-custom" placeholder="Ej: 20:00:00" required>
+            </div>
+          </div>
+          <div class="modal-footer border-secondary border-opacity-50">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-save px-3">Guardar Hora</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+ <script>
+    const API_POST_HORARIOS = "http://127.0.0.1:8000/api/personal/horarios";
+    const API_DIAS = "http://127.0.0.1:8000/api/personal/dias";
+    const API_HORAS = "http://127.0.0.1:8000/api/personal/horas";
+    const API_CLASES = "http://127.0.0.1:8000/api/personal/clases";
+    const API_ENTRENADORES = "http://127.0.0.1:8000/api/personal/entrenadores";
+
+    const token = localStorage.getItem('toke_usuario');
+    const rol = localStorage.getItem('usuario_rol');
+
+    const formHorario = document.getElementById('form-registrar-horario');
+    const btnGuardar = document.getElementById('btn-guardar');
+    const alertContainer = document.getElementById('alert-container');
+
+    // Instancias de Modales
+    const bootstrapModalDia = new bootstrap.Modal(document.getElementById('modalDia'));
+    const bootstrapModalHora = new bootstrap.Modal(document.getElementById('modalHora'));
+
+    if (!token || (rol !== 'personal' && rol !== 'Administrador')) {
+        window.location.href = "/login.html";
+    }
+
+    function getAuthHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+    }
+
+    // Inicialización: Cargar Catálogos desde la API
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarDias();
+        cargarHoras();
+        cargarClases();
+        cargarEntrenadores();
+    });
+
+    // ==========================================
+    // CARGAR SELECTORES DESDE LA API
+    // ==========================================
+    async function cargarDias() {
+        const selectDia = document.getElementById('id_dia');
+        try {
+            const res = await fetch(API_DIAS, { method: 'GET', headers: getAuthHeaders() });
+            if (!res.ok) throw new Error();
+            const dias = await res.json();
+            
+            selectDia.innerHTML = '<option value="" disabled selected>-- Elige el Día --</option>';
+            dias.forEach(d => {
+                selectDia.innerHTML += `<option value="${d.id_Dia}">${d.Dia} (ID: ${d.id_Dia})</option>`;
+            });
+        } catch (error) {
+            selectDia.innerHTML = '<option value="" disabled>Error al cargar días</option>';
+        }
+    }
+
+    async function cargarHoras() {
+        const selectHora = document.getElementById('id_hora');
+        try {
+            const res = await fetch(API_HORAS, { method: 'GET', headers: getAuthHeaders() });
+            if (!res.ok) throw new Error();
+            const horas = await res.json();
+            
+            selectHora.innerHTML = '<option value="" disabled selected>-- Elige la Hora --</option>';
+            horas.forEach(h => {
+                selectHora.innerHTML += `<option value="${h.id_Hora}">${h.Hora} (ID: ${h.id_Hora})</option>`;
+            });
+        } catch (error) {
+            selectHora.innerHTML = '<option value="" disabled>Error al cargar horas</option>';
+        }
+    }
+
+    async function cargarClases() {
+        const selectClase = document.getElementById('id_clase');
+        try {
+            const res = await fetch(API_CLASES, { method: 'GET', headers: getAuthHeaders() });
+            if (!res.ok) throw new Error();
+            const clases = await res.json();
+
+            selectClase.innerHTML = '<option value="" disabled selected>-- Elige una Clase --</option>';
+            clases.forEach(c => {
+                selectClase.innerHTML += `<option value="${c.id_Clase}">${c.Nombre} - ${c.Descripcion} (ID: ${c.id_Clase})</option>`;
+            });
+        } catch (error) {
+            selectClase.innerHTML = '<option value="" disabled>Error al cargar clases</option>';
+        }
+    }
+
+    async function cargarEntrenadores() {
+        const selectEntrenador = document.getElementById('id_entrenador');
+        try {
+            const res = await fetch(API_ENTRENADORES, { method: 'GET', headers: getAuthHeaders() });
+            if (!res.ok) throw new Error();
+            const entrenadores = await res.json();
+
+            selectEntrenador.innerHTML = '<option value="" disabled selected>-- Elige un Entrenador --</option>';
+            entrenadores.forEach(e => {
+                selectEntrenador.innerHTML += `<option value="${e.id_Entrenador}">${e.usuario.Nombre} ${e.usuario.Paterno} - ${e.especialidad.nombre_Especialidad} (ID: ${e.id_Entrenador})</option>`;
+            });
+        } catch (error) {
+            selectEntrenador.innerHTML = '<option value="" disabled>Error al cargar entrenadores</option>';
+        }
+    }
+
+    // ==========================================
+    // FORMULARIOS MODALES PARA NUEVO DÍA / HORA
+    // ==========================================
+    document.getElementById('form-modal-dia').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const inputDia = document.getElementById('input-nuevo-dia');
+        const payload = { "Dia": inputDia.value.trim() };
+
+        try {
+            const res = await fetch(API_DIAS, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error("Error en la inserción o duplicidad.");
+            
+            inputDia.value = "";
+            bootstrapModalDia.hide();
+            await cargarDias();
+            mostrarAlerta("Día registrado de forma inmediata.", "success");
+        } catch (error) {
+            alert("Error al registrar el nuevo día. Verifica que no esté duplicado.");
+        }
+    });
+
+    document.getElementById('form-modal-hora').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const inputHora = document.getElementById('input-nueva-hora');
+        const payload = { "Hora": inputHora.value.trim() };
+
+        try {
+            const res = await fetch(API_HORAS, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error("Error en la inserción o duplicidad.");
+            
+            inputHora.value = "";
+            bootstrapModalHora.hide();
+            await cargarHoras();
+            mostrarAlerta("Bloque de hora guardado con éxito.", "success");
+        } catch (error) {
+            alert("Error al registrar la hora. Recuerda usar el formato correcto.");
+        }
+    });
+
+    // ==========================================
+    // REGISTRO DE HORARIO PRINCIPAL
+    // ==========================================
+    formHorario.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        btnGuardar.disabled = true;
+        btnGuardar.textContent = "Sincronizando Agenda...";
+
+        const payloadHorario = {
+            "id_Dia": parseInt(document.getElementById('id_dia').value),
+            "id_Hora": parseInt(document.getElementById('id_hora').value),
+            "id_Clase": parseInt(document.getElementById('id_clase').value),
+            "id_Entrenador": parseInt(document.getElementById('id_entrenador').value),
+            "id_Estado": parseInt(document.getElementById('id_estado').value)
+        };
+
+        try {
+            const response = await fetch(API_POST_HORARIOS, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(payloadHorario)
+            });
+
+            const jsonResponse = await response.json().catch(() => ({}));
+
+            if (response.ok || response.status === 201) {
+                mostrarAlerta("¡Asignación horaria registrada correctamente en el sistema!", "success");
+                
+                setTimeout(() => {
+                    window.location.href = "/routes/personal/horarios/horarioclaseList.html";
+                }, 1800);
+            } else {
+                let msgError = jsonResponse.error || "Error al procesar el alta horaria en la API.";
+                if (jsonResponse.errors) {
+                    msgError = Object.values(jsonResponse.errors).flat().join("<br>");
+                }
+                throw new Error(msgError);
+            }
+        } catch (error) {
+            console.error(error);
+            mostrarAlerta(`Error en la transacción: ${error.message}`, "danger");
+            btnGuardar.disabled = false;
+            btnGuardar.textContent = "Agendar Bloque";
+        }
+    });
+
+    // ==========================================
+    // ALERTAS
+    // ==========================================
+    function mostrarAlerta(mensaje, tipo) {
+        alertContainer.innerHTML = `
+            <div class="alert alert-${tipo} alert-dismissible fade show fw-bold text-center" role="alert">
+                <div>${mensaje}</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

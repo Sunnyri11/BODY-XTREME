@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BODY XTREME - Clientes (API)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilos.css">
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #050505;
+      color: #fff;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    .fondo {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+    }
+    .fondo img {
+      width: 100%; height: 100%; object-fit: cover; opacity: 0.6; 
+    }
+    .overlay {
+      position: relative; z-index: 1; min-height: 100vh;
+      background: rgba(10, 10, 10, 0.85); 
+      display: flex; flex-direction: column;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      position: fixed; top: 0; left: -300px; width: 300px; height: 100vh;
+      background: linear-gradient(180deg, #050505 0%, #0a1f12 100%);
+      color: #fff; transition: all 0.3s ease-in-out; padding-top: 20px;
+      z-index: 1100; border-right: 2px solid #00ff88;
+      box-shadow: 5px 0 25px rgba(0, 255, 136, 0.1);
+      display: flex; flex-direction: column;
+    }
+    .sidebar.active { left: 0; }
+    #menu-roles-container { flex-grow: 1; overflow-y: auto; margin-top: 15px; }
+    .sidebar a {
+      display: flex; align-items: center; padding: 16px 25px; color: #e0e0e0;
+      text-decoration: none; font-size: 1rem; font-weight: 600;
+      transition: all 0.2s ease; border-left: 4px solid transparent;
+    }
+    .sidebar a:hover { background: rgba(0, 255, 136, 0.1); color: #00ff88; border-left: 4px solid #00ff88; padding-left: 30px; }
+    #closeSidebar { font-size: 24px; color: #fff; cursor: pointer; align-self: flex-end; margin-right: 20px; text-decoration: none; transition: 0.3s; }
+    #closeSidebar:hover { color: #dc3545; transform: scale(1.1); }
+    .sidebar .logout { padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+
+    /* --- HEADER --- */
+    header {
+      background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(10px);
+      padding: 15px 25px; display: flex; justify-content: space-between;
+      align-items: center; border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .hamburger {
+      font-size: 26px; cursor: pointer; color: #000; background: #00ff88;
+      border-radius: 8px; padding: 5px 12px; transition: all 0.3s ease;
+    }
+    .hamburger:hover { background: #00cc6c; transform: translateY(-2px); }
+    .logo-header { font-weight: 900; font-size: 1.5rem; font-style: italic; letter-spacing: 1px; margin: 0; color: #ffffff; }
+    .text-neon { color: #00ff88; text-shadow: 0 0 8px rgba(0, 255, 136, 0.4); }
+
+    /* --- COMPONENTES DEL DASHBOARD --- */
+    .card-custom {
+      background: rgba(15, 15, 15, 0.85);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 20px;
+      padding: 25px; /* Ligeramente reducido para móviles */
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+      width: 100%;
+    }
+
+    /* Responsivo para el título */
+    .titulo-moderno {
+      font-size: 1.8rem; font-weight: 900; letter-spacing: -1px;
+      text-transform: uppercase; color: #ffffff;
+    }
+    @media (min-width: 768px) {
+      .titulo-moderno { font-size: 2.2rem; }
+      .card-custom { padding: 30px; }
+    }
+
+    /* Buscador elegante */
+    .search-container { position: relative; width: 100%; }
+    .search-icon { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: #00ff88; font-size: 1.2rem; }
+    .search-input-custom {
+      background: rgba(0, 0, 0, 0.6) !important;
+      border: 1px solid #444 !important;
+      color: #fff !important;
+      padding: 12px 15px 12px 45px !important;
+      border-radius: 12px !important;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    .search-input-custom:focus { border-color: #00ff88 !important; box-shadow: 0 0 15px rgba(0, 255, 136, 0.3) !important; outline: none; }
+    .search-input-custom::placeholder { color: rgba(255, 255, 255, 0.4); }
+
+    /* Botones */
+    .btn-neon {
+      background: transparent; color: #00ff88; border: 2px solid #00ff88; border-radius: 10px; font-weight: 800; transition: all 0.3s ease;
+      display: inline-block; text-align: center;
+    }
+    .btn-neon:hover { background: #00ff88; color: #000; box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); transform: translateY(-2px); }
+
+    .btn-action-table {
+      background: transparent; border: 1px solid #00ff88; color: #00ff88; border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: bold; transition: 0.3s; white-space: nowrap;
+    }
+    .btn-action-table:hover { background: #00ff88; color: #000; box-shadow: 0 0 10px rgba(0,255,136,0.4); }
+
+    /* TABLA RESPONSIVA */
+    .table-responsive-custom { border-radius: 12px; border: 1px solid rgba(0, 255, 136, 0.2); }
+    .table-custom { margin: 0; background: rgba(0,0,0,0.4); }
+    .table-custom thead th { background-color: #0a0a0a !important; color: #00ff88 !important; border-bottom: 2px solid #00ff88 !important; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; padding: 15px; }
+    .table-custom tbody tr { transition: all 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .table-custom tbody tr:hover { background-color: rgba(0, 255, 136, 0.05) !important; }
+    .table-custom tbody td { padding: 15px; vertical-align: middle; color: #f0f0f0; border: none; }
+    .td-ci { font-weight: 900; color: #00ff88 !important; letter-spacing: 1px; }
+
+    /* Paginación */
+    .pagination-custom .page-link { background: #111; color: #e0e0e0; border: 1px solid rgba(0, 255, 136, 0.2); margin: 0 3px; border-radius: 6px; transition: 0.3s; }
+    .pagination-custom .page-item.active .page-link { background: #00ff88; color: #000; border-color: #00ff88; font-weight: bold; box-shadow: 0 0 10px rgba(0,255,136,0.3); }
+    .pagination-custom .page-link:hover:not(.active) { background: rgba(0, 255, 136, 0.1); color: #00ff88; }
+    .pagination-custom .page-item.disabled .page-link { opacity: 0.5; cursor: not-allowed; }
+
+    /* Modal Premium */
+    .modal-content-custom { background: rgba(15, 15, 15, 0.95) !important; backdrop-filter: blur(20px); border: 1px solid #00ff88 !important; border-radius: 16px; box-shadow: 0 0 40px rgba(0,0,0,0.9); }
+    .modal-header-custom { border-bottom: 1px solid rgba(0, 255, 136, 0.2); padding: 20px 25px; }
+    .modal-body { padding: 25px; }
+    .modal-footer-custom { border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 20px 25px; }
+  </style>
+</head>
+
+<body>
+
+  <div class="fondo">
+    <img src="/images/fondo.jpg" alt="Fondo Gimnasio">
+  </div>
+
+  <div class="overlay">
+
+    <header>
+      <div class="d-flex align-items-center gap-3">
+        <div class="hamburger" id="hamburger"><i class="bi bi-list"></i></div>
+        <h2 class="logo-header d-none d-sm-block">BODY <span class="text-neon">XTREME</span></h2>
+      </div>
+
+      <div class="user-info d-flex align-items-center gap-3" id="user-header-container">
+        <div id="auth-dinamico" class="text-end d-none d-sm-block small">
+          <span class="placeholder-glow"><span class="placeholder col-12 bg-secondary"></span></span>
+        </div>
+        <img src="/images/usuario.png" alt="Usuario">
+      </div>
+    </header>
+
+    <div class="sidebar" id="sidebar">
+      <a href="#" id="closeSidebar"><i class="bi bi-x-lg"></i></a>
+      <div class="px-4 text-center border-bottom pb-3 mb-2 border-secondary">
+        <h4 class="fw-bold m-0" style="color: #00ff88; font-style: italic;">STAFF PANEL</h4>
+      </div>
+      <div id="menu-roles-container"></div>
+      <div class="logout">
+        <button id="btn-logout" class="btn btn-outline-danger w-100 fw-bold" style="display: none;"><i class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión</button>
+      </div>
+    </div>
+
+    <div class="container-fluid px-3 px-md-4 px-xl-5 mt-4 mb-5 flex-grow-1">
+      
+      <div id="alert-container"></div>
+
+      <div id="panel-personal-content" style="display: none;">
+        <div class="card-custom">
+          
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center border-bottom border-secondary pb-3 mb-4 gap-3">
+            <h2 class="titulo-moderno m-0 text-center text-md-start w-100"><i class="bi bi-people-fill text-neon me-2"></i>Directorio de <span class="text-neon">Clientes</span></h2>
+            <a href="registrar_cliente.html" class="btn btn-neon py-2 px-4 shadow-sm text-uppercase w-100 w-md-auto text-nowrap"><i class="bi bi-person-plus-fill me-2"></i>Registrar Nuevo</a>
+          </div>
+          
+          <div class="row mb-4">
+            <div class="col-12 col-md-8 col-lg-6">
+              <div class="search-container">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" id="input-busqueda" class="search-input-custom" placeholder="Buscar por CI, Nombre o Apellido...">
+              </div>
+            </div>
+          </div>
+
+          <div class="table-responsive table-responsive-custom">
+            <table class="table table-custom text-center align-middle text-nowrap mb-0">
+              <thead>
+                <tr>
+                  <th>Cédula (CI)</th>
+                  <th class="text-start ps-4">Nombre del cliente</th>
+                  <th>Contacto</th>
+                  <th>Correo Electrónico</th>
+                  <th>Estado</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-clientes">
+                <tr>
+                  <td colspan="6" class="text-center text-white-50 py-5">
+                    <div class="spinner-border text-success mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+                    <p class="mb-0 fw-bold text-uppercase tracking-wider">Cargando base de datos...</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
+            <div id="info-paginacion" class="small text-white-50 fw-bold text-center text-md-start">Mostrando 0 de 0 registros</div>
+            <nav aria-label="Navegacion" class="d-flex justify-content-center">
+              <ul class="pagination pagination-custom m-0 flex-wrap justify-content-center" id="ul-paginacion"></ul>
+            </nav>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="denied-content" class="text-center p-5 bg-dark rounded mt-5" style="display: none; border: 2px solid #ff3333;">
+        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 4rem;"></i>
+        <h2 class="text-danger fw-bold text-uppercase mt-3">Acceso Denegado</h2>
+        <p class="fs-5 text-white-50">No cuentas con los privilegios de administración requeridos.</p>
+        <a href="/index.html" class="btn btn-outline-light fw-bold mt-3">Volver al Inicio</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalDetalleCliente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content modal-content-custom">
+        <div class="modal-header modal-header-custom">
+          <h5 class="modal-title fw-bold text-uppercase" style="color: #00ff88; letter-spacing: 1px;">
+            <i class="bi bi-person-vcard me-2"></i> Ficha Técnica del Cliente
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-4" id="modal-body-content"></div>
+        <div class="modal-footer modal-footer-custom d-flex flex-column flex-md-row justify-content-between gap-3">
+          <div id="modal-footer-actions" class="d-flex gap-2 flex-wrap w-100 w-md-auto justify-content-center justify-content-md-start"></div>
+          <button type="button" class="btn btn-outline-secondary fw-bold px-4 w-100 w-md-auto" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const API_URL = "http://127.0.0.1:8000/api/personal/clientes";
+    const API_INSCRIPCIONES_URL = "http://127.0.0.1:8000/api/personal/inscripciones";
+    const API_CALENDARIO_URL = "http://127.0.0.1:8000/api/calendariogimnasio";
+    
+    let cacheClientes = [];      
+    let clientesFiltrados = [];  
+    let paginaActual = 1;        
+    const registrosPorPagina = 10; 
+
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const closeSidebar = document.getElementById('closeSidebar');
+
+    hamburger.addEventListener('click', () => sidebar.classList.add('active'));
+    closeSidebar.addEventListener('click', (e) => { e.preventDefault(); sidebar.classList.remove('active'); });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('toke_usuario');
+      const rolUsuario = localStorage.getItem('usuario_rol');
+      const nombreUsuario = localStorage.getItem('nombre_usuario') || 'Usuario';
+
+      const authContainer = document.getElementById('auth-dinamico');
+      const menuContainer = document.getElementById('menu-roles-container');
+      const btnLogout = document.getElementById('btn-logout');
+      const panelContent = document.getElementById('panel-personal-content');
+      const deniedContent = document.getElementById('denied-content');
+
+      if (!token || token === 'null') {
+        authContainer.innerHTML = `<a href="/login.html" class="btn btn-neon btn-sm fw-bold">INICIO DE SESIÓN</a>`;
+        deniedContent.style.display = 'block';
+        return;
+      }
+
+      btnLogout.style.display = 'block';
+      authContainer.innerHTML = `<span class="fw-bold text-white small">${nombreUsuario}</span>`;
+
+      let htmlMenu = `<a href="/routes/personal/indexPersonal.html"><i class="bi bi-house-door me-2"></i> Inicio</a>`;
+
+      if (rolUsuario === 'personal' || rolUsuario === 'Administrador' || rolUsuario === 'Recepcionista') {
+        panelContent.style.display = 'block';
+        htmlMenu += `
+            <a href="/routes/personal/clientes/clientesList.html" style="color: #00ff88; border-left: 4px solid #00ff88; background: rgba(0,255,136,0.1);"><i class="bi bi-people me-2"></i> Clientes</a>
+            <a href="/routes/personal/entrenadores/entrenadoresList.html"><i class="bi bi-person-vcard me-2"></i> Entrenadores</a>
+            <a href="/routes/personal/membresia/membresiaList.html"><i class="bi bi-card-checklist me-2"></i> Membresías</a>
+            <a href="/routes/personal/maquinas/maquinasList.html"><i class="bi bi-tools me-2"></i> Maquinaria</a>
+            <a href="/routes/personal/horarios/horarioclaseList.html"><i class="bi bi-calendar-week me-2"></i> Horarios/Clases</a>
+            <a href="/routes/personal/verPerfilPersonal.html" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);"><i class="bi bi-person-badge me-2"></i> Mi Perfil</a>
+        `;
+        consultarClientesAPI();
+      } else {
+        deniedContent.style.display = 'block';
+      }
+      menuContainer.innerHTML = htmlMenu;
+
+      document.getElementById('input-busqueda').addEventListener('input', ejecutarFiltroBuscador);
+    });
+
+    async function consultarClientesAPI() {
+      const tbody = document.getElementById('tbody-clientes');
+      try {
+        const respuesta = await fetch(API_URL, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('toke_usuario')}`
+          }
+        });
+
+        if (!respuesta.ok) throw new Error(`Error de servidor: ${respuesta.status}`);
+
+        cacheClientes = await respuesta.json();
+        clientesFiltrados = [...cacheClientes]; 
+        
+        actualizarInterfazTabla();
+
+      } catch (error) {
+        console.error("Fallo de sincronización:", error);
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-danger fw-bold py-5">
+                    <i class="bi bi-cloud-slash fs-1 d-block mb-2"></i>
+                    ERROR DE CONEXIÓN<br>
+                    <span class="text-white-50 font-monospace small">${error.message}</span>
+                </td>
+            </tr>
+        `;
+        mostrarAlerta("No se pudo obtener la lista de clientes. Verifica que la API esté activa.", "danger");
+      }
+    }
+
+    function ejecutarFiltroBuscador(e) {
+      const query = e.target.value.trim().toLowerCase();
+      
+      if (!query) {
+        clientesFiltrados = [...cacheClientes];
+      } else {
+        const esNumerico = /^\d+$/.test(query);
+
+        clientesFiltrados = cacheClientes.filter(cliente => {
+          if (esNumerico) {
+            return String(cliente.CI_Cliente).toLowerCase().includes(query);
+          } else {
+            const nombreUsuario = cliente.usuario && cliente.usuario.Nombre ? cliente.usuario.Nombre.toLowerCase() : '';
+            const paterno = cliente.usuario && cliente.usuario.Paterno ? cliente.usuario.Paterno.toLowerCase() : '';
+            return nombreUsuario.includes(query) || paterno.includes(query);
+          }
+        });
+      }
+      paginaActual = 1; 
+      actualizarInterfazTabla();
+    }
+
+    function actualizarInterfazTabla() {
+      const tbody = document.getElementById('tbody-clientes');
+      tbody.innerHTML = '';
+
+      const totalRegistros = clientesFiltrados.length;
+      
+      if (totalRegistros === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-white-50 py-5"><i class="bi bi-search d-block fs-3 mb-2"></i>No existen registros que coincidan con la búsqueda.</td></tr>`;
+        document.getElementById('info-paginacion').textContent = `Mostrando 0 de 0 registros`;
+        document.getElementById('ul-paginacion').innerHTML = '';
+        return;
+      }
+
+      const indiceInicial = (paginaActual - 1) * registrosPorPagina;
+      const indiceFinal = Math.min(indiceInicial + registrosPorPagina, totalRegistros);
+      const registrosPagina = clientesFiltrados.slice(indiceInicial, indiceFinal);
+
+      registrosPagina.forEach((cliente) => {
+        const usr = cliente.usuario || {};
+        const est = cliente.estado || { Estado: 'Indefinido' };
+        const badgeClass = est.Estado === 'Activo' ? 'bg-success' : 'bg-secondary';
+        const nombreCompleto = `${usr.Nombre || ''} ${usr.Paterno || ''} ${usr.Materno || ''}`.trim() || 'No especificado';
+
+        const indiceOriginal = cacheClientes.findIndex(c => c.CI_Cliente === cliente.CI_Cliente);
+
+        tbody.innerHTML += `
+            <tr id="fila-cliente-${cliente.CI_Cliente}">
+                <td class="td-ci">#${cliente.CI_Cliente}</td>
+                <td class="text-start ps-4 fw-bold">${nombreCompleto}</td>
+                <td><i class="bi bi-telephone text-white-50 me-1"></i> ${usr.Telefono || '-'}</td>
+                <td class="text-lowercase small text-white-50">${usr.Correo_Electronico || '-'}</td>
+                <td>
+                  <span class="badge ${badgeClass} px-3 py-2 text-uppercase" style="letter-spacing: 1px;">${est.Estado}</span>
+                </td>
+                <td>
+                    <button class="btn-action-table text-uppercase" onclick="abrirModalDetalle(${indiceOriginal})">
+                      <i class="bi bi-eye-fill me-1"></i> Ver Ficha
+                    </button>
+                </td>
+            </tr>
+        `;
+      });
+
+      document.getElementById('info-paginacion').textContent = `Mostrando registros del ${indiceInicial + 1} al ${indiceFinal} de un total de ${totalRegistros}`;
+      construirPaginadorControladores(totalRegistros);
+    }
+
+    function construirPaginadorControladores(totalRegistros) {
+      const ulPaginacion = document.getElementById('ul-paginacion');
+      ulPaginacion.innerHTML = '';
+
+      const numeroPaginas = Math.ceil(totalRegistros / registrosPorPagina);
+      if (numeroPaginas <= 1) return;
+
+      const esPrimeraPagina = paginaActual === 1;
+      ulPaginacion.innerHTML += `
+        <li class="page-item ${esPrimeraPagina ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="cambiarPagina(${paginaActual - 1}); return false;"><i class="bi bi-chevron-left"></i></a>
+        </li>
+      `;
+
+      for (let i = 1; i <= numeroPaginas; i++) {
+        ulPaginacion.innerHTML += `
+          <li class="page-item ${paginaActual === i ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="cambiarPagina(${i}); return false;">${i}</a>
+          </li>
+        `;
+      }
+
+      const esUltimaPagina = paginaActual === numeroPaginas;
+      ulPaginacion.innerHTML += `
+        <li class="page-item ${esUltimaPagina ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="cambiarPagina(${paginaActual + 1}); return false;"><i class="bi bi-chevron-right"></i></a>
+        </li>
+      `;
+    }
+
+    window.cambiarPagina = function(numero) {
+      paginaActual = numero;
+      actualizarInterfazTabla();
+    };
+
+    async function abrirModalDetalle(index) {
+      const cliente = cacheClientes[index];
+      if (!cliente) return;
+
+      const usr = cliente.usuario || {};
+      const est = cliente.estado || { Estado: 'Indefinido' };
+      const pagos = cliente.pagos || [];
+
+      let nombrePlan = "Ninguno"; 
+      let costoMembresia = "-";
+      let vigenciaMembresia = "Sin registros históricos.";
+      let beneficiosMembresia = "El cliente no cuenta con beneficios vigentes en el sistema.";
+
+      if (pagos.length > 0) {
+        const ultimoPago = pagos[pagos.length - 1];
+        if (ultimoPago.membresia) {
+          nombrePlan = ultimoPago.membresia.Nombre_Plan || 'Plan Personalizado';
+          costoMembresia = `${parseFloat(ultimoPago.Monto).toFixed(2)} BOB`;
+          beneficiosMembresia = ultimoPago.membresia.Beneficios || "Ninguno";
+          
+          const fInicio = ultimoPago.Fecha_Inicio ? ultimoPago.Fecha_Inicio.substring(0, 10) : 'N/A';
+          const fFinal = ultimoPago.Fecha_Final ? ultimoPago.Fecha_Final.substring(0, 10) : 'N/A';
+          vigenciaMembresia = `Desde el ${fInicio} hasta el ${fFinal}`;
+        }
+      }
+
+      document.getElementById('modal-body-content').innerHTML = `
+        <div class="row g-4">
+            <div class="col-md-6 border-end border-secondary border-opacity-50 pe-md-4">
+                <h6 class="text-white fw-bold text-uppercase mb-3 border-bottom border-secondary pb-2" style="font-size: 0.85rem;"><i class="bi bi-person-fill text-neon me-2"></i>Información Personal</h6>
+                <div class="mb-3">
+                  <p class="text-white-50 small mb-1">CI de Identidad</p>
+                  <p class="fs-5 fw-bold m-0 text-neon">${cliente.CI_Cliente}</p>
+                </div>
+                <div class="mb-3">
+                  <p class="text-white-50 small mb-1">Nombre Completo</p>
+                  <p class="fw-bold m-0">${usr.Nombre || '-'} ${usr.Paterno || ''} ${usr.Materno || ''}</p>
+                </div>
+                <div class="row">
+                  <div class="col-6 mb-3">
+                    <p class="text-white-50 small mb-1">Contacto</p>
+                    <p class="m-0">${usr.Telefono || '-'}</p>
+                  </div>
+                  <div class="col-6 mb-3">
+                    <p class="text-white-50 small mb-1">Estado</p>
+                    <span class="badge ${est.Estado === 'Activo' ? 'bg-success' : 'bg-secondary'} px-3 py-1">${est.Estado}</span>
+                  </div>
+                </div>
+            </div>
+            <div class="col-md-6 ps-md-3">
+                <h6 class="text-white fw-bold text-uppercase mb-3 border-bottom border-secondary pb-2" style="font-size: 0.85rem;"><i class="bi bi-credit-card-fill text-warning me-2"></i>Estado de Membresía</h6>
+                <div class="p-3 rounded mb-3" style="background: rgba(255, 193, 7, 0.05); border: 1px solid rgba(255, 193, 7, 0.2);">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-warning fw-bold text-uppercase">${nombrePlan === 'Ninguno' ? 'Sin plan' : nombrePlan}</span>
+                    <span class="fw-bold text-white">${costoMembresia}</span>
+                  </div>
+                  <p class="text-white-50 small m-0"><i class="bi bi-calendar-range me-1"></i> ${vigenciaMembresia}</p>
+                </div>
+                <div>
+                    <strong style="font-size: 0.80rem;" class="text-uppercase text-white-50">Beneficios:</strong>
+                    <p class="mt-1 p-2 rounded small text-white-50" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);">
+                        ${beneficiosMembresia}
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-12 mt-2">
+                <h6 class="text-white fw-bold text-uppercase mb-3 border-bottom border-secondary pb-2" style="font-size: 0.85rem;"><i class="bi bi-calendar-check-fill text-info me-2"></i>Clases Asignadas</h6>
+                <div id="contenedor-clases-cliente" class="d-flex flex-column gap-2">
+                     <span class="text-white-50 small font-monospace"><i class="spinner-border spinner-border-sm me-2"></i>Buscando inscripciones...</span>
+                </div>
+            </div>
+        </div>
+      `;
+
+      document.getElementById('modal-footer-actions').innerHTML = `
+          <a href="actualizar_cliente.html?ci=${cliente.CI_Cliente}" class="btn btn-outline-warning fw-bold text-uppercase px-3 py-2 w-100 w-md-auto mb-2 mb-md-0" style="font-size:12px; border-radius: 8px;">
+            <i class="bi bi-pencil-square me-1"></i> Actualizar Info
+          </a>
+          <a href="renovar_plan.html?ci=${cliente.CI_Cliente}&plan=${encodeURIComponent(nombrePlan)}" class="btn btn-outline-success fw-bold text-uppercase px-3 py-2 w-100 w-md-auto mb-2 mb-md-0" style="font-size:12px; border-radius: 8px;">
+            <i class="bi bi-cash-coin me-1"></i> Pagar Plan
+          </a>
+          <a href="inscripciones_cliente.html?ci=${cliente.CI_Cliente}" class="btn btn-info fw-bold text-dark text-uppercase px-3 py-2 w-100 w-md-auto" style="font-size:12px; border-radius: 8px;">
+            <i class="bi bi-clipboard-check me-1"></i> Inscribir a Clases
+          </a>
+      `;
+
+      const modalElement = document.getElementById('modalDetalleCliente');
+      const modalInstance = new bootstrap.Modal(modalElement);
+      modalInstance.show();
+
+      try {
+        const cabeceras = {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('toke_usuario')}`
+        };
+
+        const [resInsc, resCalendario] = await Promise.all([
+          fetch(API_INSCRIPCIONES_URL, { method: 'GET', headers: cabeceras }),
+          fetch(API_CALENDARIO_URL, { method: 'GET', headers: cabeceras })
+        ]);
+
+        const divClases = document.getElementById('contenedor-clases-cliente');
+
+        if (resInsc.ok && resCalendario.ok) {
+          const todasLasInscripciones = await resInsc.json();
+          const todoElCalendario = await resCalendario.json();
+
+          const inscripcionesFiltradas = todasLasInscripciones.filter(ins => Number(ins.CI_Cliente) === Number(cliente.CI_Cliente));
+
+          if (inscripcionesFiltradas.length === 0) {
+            divClases.innerHTML = `
+              <div class="bg-dark p-3 rounded text-center border border-secondary border-opacity-50">
+                <i class="bi bi-calendar-x fs-3 text-white-50 d-block mb-1"></i>
+                <span class="text-white-50 small text-uppercase">El cliente no tiene clases inscritas.</span>
+              </div>`;
+          } else {
+            divClases.innerHTML = '';
+
+            inscripcionesFiltradas.forEach(ins => {
+              const infoClase = ins.clase || { Nombre: 'Clase Desconocida' };
+              const horarioClase = todoElCalendario.find(cal => Number(cal.id_Clase) === Number(ins.id_Clase));
+
+              let diaTexto = "N/A";
+              let horaTexto = "N/A";
+              let entrenadorTexto = "Sin instructor";
+
+              if (horarioClase) {
+                if (horarioClase.dia) diaTexto = horarioClase.dia.Dia || "N/A";
+                if (horarioClase.hora) horaTexto = horarioClase.hora.Hora || "N/A";
+                if (horarioClase.entrenador && horarioClase.entrenador.usuario) {
+                  const entUsr = horarioClase.entrenador.usuario;
+                  entrenadorTexto = `${entUsr.Nombre || ''} ${entUsr.Paterno || ''}`.trim();
+                }
+              }
+
+              divClases.innerHTML += `
+                <div class="p-3 bg-dark rounded border border-info border-opacity-25 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <div>
+                        <span class="fw-bold text-info text-uppercase"><i class="bi bi-lightning-charge-fill me-1"></i>${infoClase.Nombre}</span>
+                        <div class="text-white-50 small mt-1"><i class="bi bi-person-workspace me-1"></i>${entrenadorTexto}</div>
+                    </div>
+                    <div class="text-start text-md-end border-top border-secondary pt-2 border-md-0 pt-md-0 mt-2 mt-md-0">
+                        <span class="badge bg-info text-dark fw-bold px-2 py-1"><i class="bi bi-calendar-event me-1"></i>${diaTexto}</span>
+                        <div class="text-white small mt-1"><i class="bi bi-clock me-1 text-white-50"></i>${horaTexto}</div>
+                    </div>
+                </div>
+              `;
+            });
+          }
+        } else {
+          divClases.innerHTML = `<span class="text-danger small"><i class="bi bi-exclamation-circle me-1"></i> Error al cargar horarios de la API.</span>`;
+        }
+      } catch (err) {
+        document.getElementById('contenedor-clases-cliente').innerHTML = `<span class="text-danger small"><i class="bi bi-wifi-off me-1"></i> Error de conexión con el servidor.</span>`;
+      }
+    }
+
+    function mostrarAlerta(mensaje, tipo) {
+      document.getElementById('alert-container').innerHTML = `
+            <div class="alert alert-${tipo} alert-dismissible fade show fw-bold text-center border-0 shadow-lg" role="alert">
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+    }
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = '/index.html';
+    });
+  </script>
+</body>
+
+</html>

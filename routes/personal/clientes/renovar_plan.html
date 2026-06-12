@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BODY XTREME - Renovación de Membresía</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/estilos.css">
+
+  <style>
+    body { font-family: 'Montserrat', sans-serif; background-color: #050505; color: #fff; margin: 0; overflow-x: hidden; }
+    
+    .fondo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    .fondo img { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
+    .overlay { background: rgba(0, 0, 0, 0.75); min-height: 100vh; }
+
+    /* Efecto Cristal Oscuro */
+    .card-custom-form {
+      background: rgba(15, 15, 15, 0.95);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 255, 136, 0.1);
+    }
+
+    .form-label {
+      color: #00ff88;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    /* Inputs Personalizados */
+    .input-custom {
+      background: rgba(0, 0, 0, 0.5) !important;
+      border: 1px solid #444;
+      color: #fff !important;
+      padding: 10px 15px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    .input-custom:focus { border-color: #00ff88; box-shadow: 0 0 12px rgba(0, 255, 136, 0.3); outline: none; }
+    select.input-custom option { background: #1a1a1a; color: #fff; }
+
+    /* Campos Informativos No Editables */
+    .input-readonly {
+      background-color: rgba(40, 40, 40, 0.2) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      color: #00ff88 !important;
+      font-weight: 700;
+      border-radius: 12px;
+      padding: 10px 15px;
+    }
+
+    /* Botón Confirmar Pago */
+    .btn-update {
+      background: #029633;
+      color: #ffffff;
+      border: 2px solid #029633;
+      border-radius: 12px;
+      font-weight: 900;
+      transition: all 0.3s ease;
+    }
+    .btn-update:hover { 
+      background: #027a29; 
+      border-color: #027a29;
+      color: #ffffff; 
+      box-shadow: 0 0 20px rgba(2, 150, 51, 0.5); 
+      transform: translateY(-2px); 
+    }
+
+    /* Botón Cancelar con Hover Rojo */
+    .btn-cancel { 
+      border: 1px solid #6c757d;
+      color: #ffffff;
+      background: transparent;
+      border-radius: 12px; 
+      transition: all 0.3s; 
+    }
+    .btn-cancel:hover { 
+      background: #dc3545; 
+      border-color: #dc3545;
+      color: white; 
+      box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
+      transform: translateY(-2px); 
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="fondo">
+    <img src="/images/fondoPersonal.png" alt="Fondo Gimnasio">
+  </div>
+
+  <div class="overlay d-flex align-items-center justify-content-center py-3">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+
+          <div id="alert-container"></div>
+
+          <div class="card-custom-form p-4">
+            <div class="text-center mb-3 border-bottom pb-3 border-secondary">
+              <div class="d-inline-block p-2 rounded-circle mb-2" style="background: rgba(0, 255, 136, 0.1);">
+                <i class="bi bi-credit-card-2-front fs-2" style="color: #00ff88;"></i>
+              </div>
+              <h4 class="fw-bold m-0 text-uppercase" style="color: #ffffff; letter-spacing: 1px;">
+                Nueva <span style="color: #00ff88;">Renovación</span>
+              </h4>
+              <p class="text-white-50 small m-0 mt-1 fw-bold" id="info-cliente-transaccion">Sincronizando datos del socio...</p>
+            </div>
+
+            <form id="form-renovar-plan">
+              
+              <div class="mb-3">
+                <label class="form-label"><i class="bi bi-person me-2"></i>Nombre del Socio</label>
+                <input type="text" id="nombre_cliente" class="form-control input-readonly" readonly value="Cargando...">
+              </div>
+
+              <div class="mb-3">
+                <label for="id_membresia" class="form-label"><i class="bi bi-award me-2"></i>Seleccionar Nuevo Plan</label>
+                <select id="id_membresia" class="form-select input-custom" required>
+                  <option value="" disabled selected>Cargando planes disponibles...</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="info_beneficios" class="form-label"><i class="bi bi-card-text me-2"></i>Beneficios Incorporados</label>
+                <textarea id="info_beneficios" class="form-control input-readonly" rows="2" readonly placeholder="Metadata del plan..."></textarea>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="info_duracion" class="form-label"><i class="bi bi-clock-history me-2"></i>Duración del Ciclo</label>
+                  <input type="text" id="info_duracion" class="form-control input-readonly" readonly placeholder="Ej: 30 días">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="monto" class="form-label"><i class="bi bi-cash-stack me-2"></i>Monto a Cobrar (BOB)</label>
+                  <input type="text" id="monto" class="form-control input-readonly" readonly value="0.00">
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="fecha_inicio" class="form-label"><i class="bi bi-calendar-event me-2"></i>Fecha de Inicio</label>
+                  <input type="date" id="fecha_inicio" class="form-control input-custom" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="fecha_final" class="form-label"><i class="bi bi-calendar-check me-2"></i>Vigencia Hasta (Auto)</label>
+                  <input type="date" id="fecha_final" class="form-control input-readonly" readonly>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="id_metodo_pago" class="form-label"><i class="bi bi-wallet2 me-2"></i>Método de Pago</label>
+                <select id="id_metodo_pago" class="form-select input-custom" required>
+                  <option value="1">Efectivo</option>
+                  <option value="2">Transferencia / QR</option>
+                </select>
+              </div>
+
+              <div class="d-flex flex-column flex-sm-row gap-3 pt-3 border-top border-secondary mt-2">
+                <button type="submit" id="btn-procesar" class="btn btn-update w-100 py-2.5 text-uppercase">
+                  <i class="bi bi-check-circle-fill me-2"></i>Confirmar Pago
+                </button>
+                <a href="clientesList.html" class="btn btn-cancel w-100 py-2.5 fw-bold text-decoration-none text-center">
+                  <i class="bi bi-x-circle me-2"></i>Cancelar
+                </a>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const CI_CLIENTE = urlParams.get('ci') || urlParams.get('CI_Cliente');
+    const PLAN_PREVIO = urlParams.get('plan') ? decodeURIComponent(urlParams.get('plan')).trim() : '';
+
+    const API_CLIENTES_URL = "http://127.0.0.1:8000/api/personal/clientes";
+    const API_MEMBRESIAS_URL = "http://127.0.0.1:8000/api/personal/membresias";
+    const API_PAGOS_URL = "http://127.0.0.1:8000/api/personal/pagos";
+
+    const form = document.getElementById('form-renovar-plan');
+    const selectMembresia = document.getElementById('id_membresia');
+    const inputFechaInicio = document.getElementById('fecha_inicio');
+    const inputFechaFinal = document.getElementById('fecha_final');
+    const alertContainer = document.getElementById('alert-container');
+
+    let catalogoMembresias = {};
+
+    function getAuthHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('toke_usuario')}`
+      };
+    }
+
+    inputFechaInicio.value = new Date().toISOString().split('T')[0];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!CI_CLIENTE) {
+        mostrarAlerta("❌ No se detectó CI en la URL.", "danger");
+        return;
+      }
+
+      document.getElementById('info-cliente-transaccion').textContent = `Registro para el CI: #${CI_CLIENTE}`;
+
+      try {
+        const resCliente = await fetch(`${API_CLIENTES_URL}/${CI_CLIENTE}`, { headers: getAuthHeaders() });
+        if (resCliente.ok) {
+          const cliente = await resCliente.json();
+          document.getElementById('nombre_cliente').value = `${cliente.usuario.Nombre} ${cliente.usuario.Paterno} ${cliente.usuario.Materno || ''}`.trim();
+        }
+
+        const resMembresias = await fetch(API_MEMBRESIAS_URL, { headers: getAuthHeaders() });
+        if (resMembresias.ok) {
+          const lista = await resMembresias.json();
+          
+          if (lista.length === 0) {
+            selectMembresia.innerHTML = '<option value="" disabled selected>-- No hay planes configurados --</option>';
+            return;
+          }
+
+          selectMembresia.innerHTML = '<option value="" disabled>-- Elija el Plan --</option>';
+          
+          let idSeleccionadoPorDefecto = null;
+
+          lista.forEach((m, index) => {
+            catalogoMembresias[m.id_Membresia] = m;
+            selectMembresia.innerHTML += `<option value="${m.id_Membresia}">${m.Nombre_Plan} (${m.Precio} BOB)</option>`;
+            
+            if (PLAN_PREVIO && PLAN_PREVIO !== 'Ninguno' && m.Nombre_Plan.trim().toLowerCase() === PLAN_PREVIO.toLowerCase()) {
+              idSeleccionadoPorDefecto = m.id_Membresia;
+            }
+            
+            if (index === 0 && (!PLAN_PREVIO || PLAN_PREVIO === 'Ninguno')) {
+              idSeleccionadoPorDefecto = m.id_Membresia;
+            }
+          });
+
+          if (idSeleccionadoPorDefecto) {
+            selectMembresia.value = idSeleccionadoPorDefecto;
+            selectMembresia.dispatchEvent(new Event('change'));
+          } else {
+            selectMembresia.selectedIndex = 0;
+          }
+        }
+      } catch (e) {
+        console.error(e);
+        mostrarAlerta("Error al sincronizar con el servidor.", "danger");
+      }
+    });
+
+    selectMembresia.addEventListener('change', () => {
+      const plan = catalogoMembresias[selectMembresia.value];
+      if (plan) {
+        document.getElementById('monto').value = `${parseFloat(plan.Precio).toFixed(2)} BOB`;
+        document.getElementById('info_beneficios').value = plan.Beneficios || 'Básicos';
+        if (plan.tiposmembresia) {
+          document.getElementById('info_duracion').value = `${plan.tiposmembresia.Tipo} (${plan.tiposmembresia.Duracion} dias)`;
+          calcularFechaFinal(plan.tiposmembresia.Duracion);
+        }
+      }
+    });
+
+    inputFechaInicio.addEventListener('change', () => {
+      const plan = catalogoMembresias[selectMembresia.value];
+      if (plan && plan.tiposmembresia) calcularFechaFinal(plan.tiposmembresia.Duracion);
+    });
+
+    function calcularFechaFinal(dias) {
+      const partes = inputFechaInicio.value.split('-');
+      const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
+      fecha.setDate(fecha.getDate() + parseInt(dias));
+      
+      const yyyy = fecha.getFullYear();
+      const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+      const dd = String(fecha.getDate()).padStart(2, '0');
+      inputFechaFinal.value = `${yyyy}-${mm}-${dd}`;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const payload = {
+        "id_Metodo_Pago": parseInt(document.getElementById('id_metodo_pago').value),
+        "CI_Cliente": parseInt(CI_CLIENTE),
+        "id_Membresia": parseInt(selectMembresia.value),
+        "Fecha_Pago": new Date().toISOString().split('T')[0],
+        "Fecha_Inicio": inputFechaInicio.value
+      };
+
+      document.getElementById('btn-procesar').disabled = true;
+      document.getElementById('btn-procesar').textContent = "Procesando...";
+
+      try {
+        const response = await fetch(API_PAGOS_URL, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          mostrarAlerta("✔️ Renovación y pago registrados correctamente.", "success");
+          setTimeout(() => { window.location.href = "clientesList.html"; }, 2000);
+        } else {
+          const err = await response.json();
+          throw new Error(err.message || "Error al procesar el pago.");
+        }
+      } catch (error) {
+        mostrarAlerta(error.message, "danger");
+        document.getElementById('btn-procesar').disabled = false;
+        document.getElementById('btn-procesar').textContent = "Confirmar Pago";
+      }
+    });
+
+    function mostrarAlerta(mensaje, tipo) {
+      alertContainer.innerHTML = `<div class="alert alert-${tipo} alert-dismissible fade show fw-bold text-center border-0 shadow-lg">${mensaje}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
