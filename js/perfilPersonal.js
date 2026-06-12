@@ -15,7 +15,6 @@ function getAuthHeaders() {
 async function cargarDatosStaff() {
     try {
         // 1. Descargamos la lista completa de todo el personal
-        // 1. Descargamos la lista completa de todo el personal
         const response = await fetch(`${API_BASE_URL}/personal/staff`, {
             method: 'GET',
             headers: getAuthHeaders()

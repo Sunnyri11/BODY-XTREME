@@ -61,7 +61,10 @@
     .btn-cancel:hover { background: #dc3545; border-color: #dc3545; color: white; box-shadow: 0 0 15px rgba(220, 53, 69, 0.4); transform: translateY(-2px); }
 
     /* Modals */
-    .modal-content-dark { background: rgba(15, 15, 15, 0.98) !important; backdrop-filter: blur(20px); border: 1px solid #00ff88 !important; border-radius: 16px; }
+    .modal-content-dark { background: rgba(15, 15, 15, 0.98) !important; backdrop-filter: blur(20px); border: 1px solid #00ff88 !important; border-radius: 16px; color: #fff;}
+    .modal-header { border-bottom: 1px solid rgba(0, 255, 136, 0.2); padding: 18px 25px; }
+    .modal-footer { border-top: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 25px; }
+    .text-neon { color: #00ff88; }
   </style>
 </head>
 
@@ -201,6 +204,260 @@
     </div>
   </div>
 
+  <div class="modal fade" id="modalNuevaEspecialidad" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content modal-content-dark">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold text-uppercase text-neon"><i class="bi bi-award-fill me-2"></i> Nueva Especialidad</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="form-nueva-especialidad">
+          <div class="modal-body">
+            <div id="especialidad-alert-container"></div>
+            <div class="mb-3">
+              <label class="form-label" for="nombre_especialidad">Nombre de la Especialidad</label>
+              <input type="text" id="nombre_especialidad" class="form-control input-custom" placeholder="Ej: Spinning, Zumba, Crossfit" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary fw-bold px-3" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" id="btn-guardar-especialidad" class="btn btn-success fw-bold px-4">GUARDAR</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+
+  <script>
+    const API_ENTRENADORES_BASE = "http://127.0.0.1:8000/api/personal/entrenadores";
+    const API_CONTRATOS_URL = "http://127.0.0.1:8000/api/personal/contratos";
+    const API_ESPECIALIDADES_URL = "http://127.0.0.1:8000/api/especialidades";
+    
+    const token = localStorage.getItem('toke_usuario');
+    const rol = localStorage.getItem('usuario_rol');
+
+    const formEntrenador = document.getElementById('form-registro-entrenador');
+    const formContrato = document.getElementById('form-nuevo-contrato');
+    const formEspecialidad = document.getElementById('form-nueva-especialidad');
+    
+    const selectContrato = document.getElementById('id_contrato');
+    const selectEspecialidad = document.getElementById('id_especialidad');
+    
+    const btnRegistrar = document.getElementById('btn-registrar');
+    const btnGuardarContrato = document.getElementById('btn-guardar-contrato');
+    const btnGuardarEspecialidad = document.getElementById('btn-guardar-especialidad');
+    
+    const alertContainer = document.getElementById('alert-container');
+    const modalAlertContainer = document.getElementById('modal-alert-container');
+    const especialidadAlertContainer = document.getElementById('especialidad-alert-container');
+
+    // Control de acceso básico igual al de actualizar
+    if (!token || (rol !== 'personal' && rol !== 'Administrador' && rol !== 'Recepcionista')) {
+      window.location.href = "/login.html";
+    }
+
+    function getAuthHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+    }
+
+    function mostrarAlerta(mensaje, tipo) {
+      alertContainer.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show fw-semibold" role="alert">
+          ${tipo === 'success' ? '✅' : '❌'} ${mensaje}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      `;
+    }
+
+    // Inicialización al cargar la página
+    document.addEventListener('DOMContentLoaded', async () => {
+      await cargarContratos();
+      await cargarEspecialidades();
+    });
+
+    async function cargarContratos(idPreseleccionado = null) {
+      try {
+        const response = await fetch(API_CONTRATOS_URL, {
+          method: 'GET',
+          headers: getAuthHeaders()
+        });
+        if (!response.ok) throw new Error("Falla al leer la base de contratos.");
+
+        const contratos = await response.json();
+        selectContrato.innerHTML = '<option value="" disabled selected>-- Elige un contrato laboral --</option>';
+        contratos.forEach(c => {
+          selectContrato.innerHTML += `
+            <option value="${c.id_Contrato}">
+              Sueldo: ${c.Sueldo} BOB | Detalles: ${c.Detalles || c.detalles}
+            </option>
+          `;
+        });
+
+        if (idPreseleccionado) {
+          selectContrato.value = idPreseleccionado;
+        }
+      } catch (error) {
+        console.error(error);
+        mostrarAlerta("Error de red al cargar el catálogo de contratos.", "danger");
+      }
+    }
+
+    async function cargarEspecialidades(idPreseleccionado = null) {
+      try {
+        const response = await fetch(API_ESPECIALIDADES_URL, {
+          method: 'GET',
+          headers: getAuthHeaders()
+        });
+        if (!response.ok) throw new Error();
+
+        const especialidades = await response.json();
+        selectEspecialidad.innerHTML = `<option value="" disabled selected>-- Seleccione una especialidad --</option>`;
+        especialidades.forEach(e => {
+          selectEspecialidad.innerHTML += `
+            <option value="${e.id_Especialidad}">
+              ${e.nombre_Especialidad}
+            </option>
+          `;
+        });
+
+        if (idPreseleccionado) {
+          selectEspecialidad.value = idPreseleccionado;
+        }
+      } catch (error) {
+        mostrarAlerta('No se pudieron cargar las especialidades.', 'danger');
+      }
+    }
+
+    // Guardar Nuevo Contrato desde Modal
+    formContrato.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btnGuardarContrato.disabled = true;
+
+      const payloadContrato = {
+        "Fecha_Contratacion": `${document.getElementById('fecha_contratacion').value} 00:00:00`,
+        "Fecha_Vigencia": `${document.getElementById('fecha_vigencia').value} 00:00:00`,
+        "Sueldo": parseInt(document.getElementById('sueldo').value),
+        "detalles": document.getElementById('detalles').value.trim()
+      };
+
+      try {
+        const response = await fetch(API_CONTRATOS_URL, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payloadContrato)
+        });
+
+        const resData = await response.json().catch(() => ({}));
+
+        if (response.ok || response.status === 201) {
+          formContrato.reset();
+          modalAlertContainer.innerHTML = "";
+          bootstrap.Modal.getInstance(document.getElementById('modalNuevoContrato')).hide();
+
+          const nuevoId = resData.id_Contrato || null;
+          await cargarContratos(nuevoId);
+          mostrarAlerta("¡Nuevo contrato generado y asociado con éxito!", "success");
+        } else {
+          throw new Error(resData.message || "No se pudo crear el contrato.");
+        }
+      } catch (error) {
+        modalAlertContainer.innerHTML = `<div class="alert alert-danger fw-bold small py-2 mb-0">❌ Error: ${error.message}</div>`;
+      } finally {
+        btnGuardarContrato.disabled = false;
+      }
+    });
+
+    // Guardar Nueva Especialidad desde Modal
+    formEspecialidad.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btnGuardarEspecialidad.disabled = true;
+
+      const payload = {
+        nombre_Especialidad: document.getElementById('nombre_especialidad').value.trim()
+      };
+
+      try {
+        const response = await fetch(API_ESPECIALIDADES_URL, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+
+        const resData = await response.json();
+
+        if (response.ok || response.status === 201) {
+          formEspecialidad.reset();
+          especialidadAlertContainer.innerHTML = "";
+          bootstrap.Modal.getInstance(document.getElementById('modalNuevaEspecialidad')).hide();
+
+          await cargarEspecialidades(resData.especialidad?.id_Especialidad || resData.id_Especialidad);
+          mostrarAlerta('Especialidad creada correctamente.', 'success');
+        } else {
+          throw new Error(resData.message || "Error al crear especialidad.");
+        }
+      } catch (error) {
+        especialidadAlertContainer.innerHTML = `<div class="alert alert-danger fw-bold small py-2 mb-0">❌ Error: ${error.message}</div>`;
+      } finally {
+        btnGuardarEspecialidad.disabled = false;
+      }
+    });
+
+    // Registrar Entrenador (POST)
+    formEntrenador.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      btnRegistrar.disabled = true;
+      btnRegistrar.textContent = "Registrando...";
+
+      const payload = {
+        "Nombre": document.getElementById('nombre').value.trim(),
+        "Paterno": document.getElementById('paterno').value.trim(),
+        "Materno": document.getElementById('materno').value.trim(),
+        "Telefono": document.getElementById('telefono').value.toString(),
+        "Correo_Electronico": document.getElementById('correo').value.trim(),
+        "Contraseña": document.getElementById('contrasena').value,
+        "Contraseña_confirmation": document.getElementById('contrasena').value,
+        "id_Especialidad": parseInt(selectEspecialidad.value),
+        "id_Contrato": parseInt(selectContrato.value)
+      };
+
+      try {
+        const response = await fetch(API_ENTRENADORES_BASE, {
+          method: 'POST', // Para registrar es POST
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+
+        const jsonResponse = await response.json().catch(() => ({}));
+
+        if (response.ok || response.status === 201) {
+          mostrarAlerta("¡El entrenador ha sido registrado exitosamente!", "success");
+          setTimeout(() => {
+            window.location.href = "/routes/personal/entrenadores/entrenadoresList.html";
+          }, 2000);
+        } else {
+          // Desplegar errores detallados de Laravel si existen
+          let msgError = jsonResponse.message || "Error al procesar el registro.";
+          if (jsonResponse.errors) {
+            msgError = Object.values(jsonResponse.errors).flat().join("<br>");
+          }
+          mostrarAlerta(msgError, "danger");
+          btnRegistrar.disabled = false;
+          btnRegistrar.textContent = "Registrar Entrenador";
+        }
+      } catch (error) {
+        console.error(error);
+        mostrarAlerta("Error de conexión con el servidor.", "danger");
+        btnRegistrar.disabled = false;
+        btnRegistrar.textContent = "Registrar Entrenador";
+      }
+    });
+  </script>
+</body>
 </html>

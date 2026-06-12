@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnTexto = document.getElementById("btn-texto");
     const btnSpinner = document.getElementById("btn-spinner");
 
-    const API_BASE_URL = "http://127.0.0.1:8000/api";
+    const API_BASE_URL = window.EnvConfig.ROUTES.LOGIN;
 
     // Función auxiliar para pintar alertas rápidamente
     function mostrarAlerta(mensaje, tipo = "danger") {
@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btnSpinner.classList.remove("d-none");
 
         try {
-            const response = await fetch(`${API_BASE_URL}/login`, {
+            const response = await fetch(`${API_BASE_URL}`, {
                 method: "POST",
                 headers: {
                     "Accept": "application/json",
